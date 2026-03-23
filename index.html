@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Trailforks — Reimagined</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --green: #2D6A4F; --green-light: #40916C; --green-bg: #D8F3DC;
+    --orange: #E76F51; --orange-bg: #FDEEE9;
+    --blue: #264653; --blue-light: #2A9D8F;
+    --dark: #1B1B1B; --gray: #6B7280; --light: #F9FAFB;
+    --radius: 16px;
+  }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--light); color: var(--dark);
+    overflow: hidden; height: 100dvh; width: 100vw;
+  }
+
+  /* ── Screen transitions ── */
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; transform: translateX(60px);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .screen.active { opacity: 1; transform: translateX(0); pointer-events: all; }
+  .screen.exit { opacity: 0; transform: translateX(-60px); pointer-events: none; }
+
+  /* ── Top bar ── */
+  .topbar { display: flex; align-items: center; padding: 16px 20px 8px; min-height: 56px; }
+  .back-btn {
+    width: 40px; height: 40px; border: none; background: none;
+    font-size: 22px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; color: var(--gray); border-radius: 12px;
+  }
+  .back-btn:active { background: #eee; }
+  .back-btn.hidden { visibility: hidden; }
+  .progress { flex: 1; display: flex; gap: 6px; padding: 0 12px; }
+  .progress-dot {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: #E5E7EB; transition: background 0.4s;
+  }
+  .progress-dot.filled { background: var(--green); }
+  .progress-dot.current { background: var(--green-light); }
+
+  /* ── Question area ── */
+  .q-area { padding: 24px 24px 16px; }
+  .q-label {
+    font-size: 13px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--green); margin-bottom: 8px;
+  }
+  .q-text { font-size: 28px; font-weight: 800; line-height: 1.15; margin-bottom: 6px; }
+  .q-sub { font-size: 15px; color: var(--gray); line-height: 1.5; }
+
+  /* ── Option cards (list) ── */
+  .opts { padding: 8px 24px 40px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .opt {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 20px; background: #fff; border: 2px solid #E5E7EB;
+    border-radius: var(--radius); cursor: pointer;
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+  }
+  .opt:active { transform: scale(0.97); }
+  .opt.sel { border-color: var(--green); background: var(--green-bg); }
+  .opt-icon {
+    font-size: 32px; width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; background: var(--light); flex-shrink: 0;
+  }
+  .opt.sel .opt-icon { background: rgba(45,106,79,0.15); }
+  .opt-info { flex: 1; }
+  .opt-title { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+  .opt-desc { font-size: 13px; color: var(--gray); line-height: 1.4; }
+
+  /* ── Grid cards ── */
+  .opts-grid {
+    padding: 8px 24px 40px; display: grid;
+    grid-template-columns: 1fr 1fr; gap: 12px; flex: 1;
+  }
+  .g-card {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 10px; padding: 24px 12px;
+    background: #fff; border: 2px solid #E5E7EB; border-radius: var(--radius);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .g-card:active { transform: scale(0.96); }
+  .g-card.sel { border-color: var(--green); background: var(--green-bg); }
+  .g-card .g-icon { font-size: 36px; }
+  .g-card .g-label { font-size: 15px; font-weight: 700; }
+  .g-card .g-sub { font-size: 12px; color: var(--gray); line-height: 1.3; }
+
+  /* ═══ Results ═══ */
+  .res-header {
+    background: linear-gradient(135deg, var(--green) 0%, var(--blue-light) 100%);
+    padding: 48px 24px 28px; color: #fff;
+  }
+  .res-header .tag {
+    display: inline-block; background: rgba(255,255,255,0.2);
+    padding: 4px 12px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; margin-bottom: 12px; letter-spacing: 0.04em;
+  }
+  .res-header h1 { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  .res-header p { font-size: 15px; opacity: 0.85; line-height: 1.5; }
+
+  .res-body { padding: 20px 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* info cards */
+  .icard {
+    background: #fff; border-radius: var(--radius);
+    padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .icard-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .icard-ico {
+    font-size: 20px; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; flex-shrink: 0;
+  }
+  .icard-title { font-size: 16px; font-weight: 700; }
+  .icard p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+  .icard.warn { border-left: 4px solid var(--orange); background: var(--orange-bg); }
+  .icard.warn .icard-ico { background: rgba(231,111,81,0.15); }
+  .icard.tip .icard-ico { background: rgba(42,157,143,0.15); }
+  .icard.cond .icard-ico { background: rgba(45,106,79,0.15); }
+
+  /* ── Trail cards ── */
+  .section-title { font-size: 18px; font-weight: 800; padding: 8px 0 4px; }
+
+  .trail {
+    background: #fff; border-radius: var(--radius);
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .trail-hero {
+    height: 120px; background-size: cover; background-position: center;
+    position: relative; display: flex; align-items: flex-end; padding: 10px;
+    gap: 6px; flex-wrap: wrap;
+  }
+  /* ── Human-readable badges ── */
+  .badge {
+    padding: 4px 10px; border-radius: 8px;
+    font-size: 12px; font-weight: 700; color: #fff;
+    backdrop-filter: blur(4px);
+  }
+  .badge-green { background: rgba(34,197,94,0.9); }
+  .badge-blue { background: rgba(59,130,246,0.9); }
+  .badge-orange { background: rgba(249,115,22,0.9); }
+  .badge-red { background: rgba(239,68,68,0.9); }
+  .badge-purple { background: rgba(139,92,246,0.9); }
+  .badge-gray { background: rgba(75,85,99,0.85); }
+  .badge-teal { background: rgba(20,184,166,0.9); }
+
+  .trail-body { padding: 14px 16px; }
+  .trail-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .trail-meta { font-size: 13px; color: var(--gray); display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .trail-note {
+    font-size: 13px; line-height: 1.5; color: #4B5563;
+    background: #F3F4F6; padding: 10px 12px; border-radius: 10px;
+    border-left: 3px solid var(--green-light);
+  }
+
+  /* ── Map placeholder ── */
+  .map-box {
+    background: linear-gradient(145deg, #D8F3DC, #B7E4C7, #95D5B2);
+    border-radius: var(--radius); height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .map-box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .map-label {
+    font-size: 14px; font-weight: 600; color: var(--green);
+    background: rgba(255,255,255,0.85); padding: 8px 16px;
+    border-radius: 10px; z-index: 1;
+  }
+
+  .restart {
+    margin: 8px auto 60px; padding: 12px 24px;
+    border: 2px solid var(--green); background: #fff; border-radius: 12px;
+    font-size: 14px; font-weight: 600; color: var(--green);
+    cursor: pointer; font-family: inherit;
+  }
+  .restart:active { background: var(--green-bg); }
+</style>
+</head>
+<body>
+
+<!-- ═══ S1: Activity ═══ -->
+<div class="screen active" id="s1">
+  <div class="topbar">
+    <button class="back-btn hidden">&larr;</button>
+    <div class="progress">
+      <div class="progress-dot current"></div><div class="progress-dot"></div>
+      <div class="progress-dot"></div><div class="progress-dot"></div>
+    </div>
+  </div>
+  <div class="q-area">
+    <div class="q-label">Let's go</div>
+    <div class="q-text">What are you getting into today?</div>
+    <div class="q-sub">We'll figure out what you need from there.</div>
+  </div>
+  <div class="opts" id="o1">
+    <div class="opt" data-v="ride"><div class="opt-icon">🚲</div><div class="opt-info"><div class="opt-title">Ride</div><div class="opt-desc">Mountain, gravel, road — any kind</div></div></div>
+    <div class="opt" data-v="hike"><div class="opt-icon">🥾</div><div class="opt-info"><div class="opt-title">Hike</div><div class="opt-desc">Get out on foot, find a trail</div></div></div>
+    <div class="opt" data-v="run"><div class="opt-icon">🏃</div><div class="opt-info"><div class="opt-title">Run</div><div class="opt-desc">Trail running, all terrain</div></div></div>
+    <div class="opt" data-v="walk"><div class="opt-icon">🌿</div><div class="opt-info"><div class="opt-title">Walk / Explore</div><div class="opt-desc">Casual, scenic, accessible</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ S2: Specifics (dynamic) ═══ -->
+<div class="screen" id="s2">
+  <div class="topbar">
+    <button class="back-btn" onclick="goBack()">&larr;</button>
+    <div class="progress">
+      <div class="progress-dot filled"></div><div class="progress-dot current"></div>
+      <div class="progress-dot"></div><div class="progress-dot"></div>
+    </div>
+  </div>
+  <div class="q-area">
+    <div class="q-label" id="s2-label"></div>
+    <div class="q-text" id="s2-q"></div>
+    <div class="q-sub" id="s2-sub"></div>
+  </div>
+  <div id="s2-box"></div>
+</div>
+
+<!-- ═══ S3: Experience ═══ -->
+<div class="screen" id="s3">
+  <div class="topbar">
+    <button class="back-btn" onclick="goBack()">&larr;</button>
+    <div class="progress">
+      <div class="progress-dot filled"></div><div class="progress-dot filled"></div>
+      <div class="progress-dot current"></div><div class="progress-dot"></div>
+    </div>
+  </div>
+  <div class="q-area">
+    <div class="q-label">Experience</div>
+    <div class="q-text" id="s3-q">How familiar are you with this?</div>
+    <div class="q-sub" id="s3-sub"></div>
+  </div>
+  <div class="opts" id="o3">
+    <div class="opt" data-v="first"><div class="opt-icon">🌱</div><div class="opt-info"><div class="opt-title">First time</div><div class="opt-desc">Brand new — show me the ropes</div></div></div>
+    <div class="opt" data-v="few"><div class="opt-icon">👍</div><div class="opt-info"><div class="opt-title">A few times</div><div class="opt-desc">I've done it but I'm still learning</div></div></div>
+    <div class="opt" data-v="regular"><div class="opt-icon">💪</div><div class="opt-info"><div class="opt-title">Regular</div><div class="opt-desc">I know what I'm doing, want more</div></div></div>
+    <div class="opt" data-v="seasoned"><div class="opt-icon">🔥</div><div class="opt-info"><div class="opt-title">Seasoned</div><div class="opt-desc">Just show me the good stuff</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ S4: Vibe ═══ -->
+<div class="screen" id="s4">
+  <div class="topbar">
+    <button class="back-btn" onclick="goBack()">&larr;</button>
+    <div class="progress">
+      <div class="progress-dot filled"></div><div class="progress-dot filled"></div>
+      <div class="progress-dot filled"></div><div class="progress-dot current"></div>
+    </div>
+  </div>
+  <div class="q-area">
+    <div class="q-label">Vibe</div>
+    <div class="q-text" id="s4-q">What are you in the mood for?</div>
+    <div class="q-sub">This shapes which trails and info we show you.</div>
+  </div>
+  <div class="opts-grid" id="o4">
+    <div class="g-card" data-v="chill"><div class="g-icon">☀️</div><div class="g-label">Chill</div><div class="g-sub">Easy, scenic, no stress</div></div>
+    <div class="g-card" data-v="challenge"><div class="g-icon">⛰️</div><div class="g-label">Challenge me</div><div class="g-sub">Push my limits a bit</div></div>
+    <div class="g-card" data-v="adventure"><div class="g-icon">🗺️</div><div class="g-label">Adventure</div><div class="g-sub">Explore somewhere new</div></div>
+    <div class="g-card" data-v="workout"><div class="g-icon">⚡</div><div class="g-label">Workout</div><div class="g-sub">Effort & distance</div></div>
+  </div>
+</div>
+
+<!-- ═══ S5: Results ═══ -->
+<div class="screen" id="s5">
+  <div class="res-header">
+    <div class="tag" id="r-tag"></div>
+    <h1 id="r-title"></h1>
+    <p id="r-sub"></p>
+  </div>
+  <div class="res-body" id="r-body"></div>
+</div>
+
+<script>
+const S = { act: null, spec: null, exp: null, vibe: null };
+let hist = [];
+let cur = 0;
+const ids = ['s1','s2','s3','s4','s5'];
+
+// ── Specifics config ──
+const specCfg = {
+  ride: {
+    label: 'Gear check', q: 'What are you riding?',
+    sub: 'This changes everything about which trails work for you.',
+    grid: true,
+    opts: [
+      { v:'mtb', icon:'🏔️', label:'Mountain bike', sub:'Full sus or hardtail' },
+      { v:'gravel', icon:'🛤️', label:'Gravel bike', sub:'Drop bars, wider tires' },
+      { v:'road', icon:'🚴', label:'Road bike', sub:'Pavement & smooth paths' },
+      { v:'ebike', icon:'⚡', label:'E-bike', sub:'Pedal-assist, any style' },
+    ]
+  },
+  hike: {
+    label: 'Details', q: 'What kind of hike?',
+    sub: 'Helps us match the right trails to your day.',
+    opts: [
+      { v:'day', icon:'🌤️', label:'Day hike', desc:'A few hours, maybe a packed lunch' },
+      { v:'long', icon:'🏕️', label:'Full day / long hike', desc:'6+ hours, real distance' },
+      { v:'dog', icon:'🐕', label:'With my dog', desc:'Need dog-friendly trails' },
+      { v:'family', icon:'👨‍👩‍👧', label:'Family outing', desc:'Kids in tow, keep it manageable' },
+    ]
+  },
+  run: {
+    label: 'Terrain', q: 'What kind of running?',
+    sub: 'Trail surface and tech matters for footwear.',
+    opts: [
+      { v:'trail', icon:'🌲', label:'Trail running', desc:'Singletrack, natural surface' },
+      { v:'ultra', icon:'🏔️', label:'Long distance / ultra', desc:'Big miles, route planning' },
+      { v:'mixed', icon:'🛤️', label:'Mixed terrain', desc:'Some road, some trail' },
+      { v:'casual', icon:'😊', label:'Casual jog', desc:'Easy paths, nice scenery' },
+    ]
+  },
+  walk: {
+    label: 'Preferences', q: 'Any specifics?',
+    sub: 'So we show you the right paths.',
+    opts: [
+      { v:'scenic', icon:'📸', label:'Scenic / viewpoints', desc:'Pretty spots, photo ops' },
+      { v:'accessible', icon:'♿', label:'Accessible paths', desc:'Paved or wheelchair-friendly' },
+      { v:'nature', icon:'🌿', label:'Nature walk', desc:'Forests, meadows, wildlife' },
+      { v:'loop', icon:'🔄', label:'Easy loop', desc:'Short, starts and ends same spot' },
+    ]
+  },
+};
+
+// ── Experience question customization ──
+const expQ = {
+  'ride-mtb': ['How much mountain biking have you done?','No judgment — helps us filter technical trails.'],
+  'ride-gravel': ['How new are you to gravel?','Gravel ranges from smooth fire roads to sketchy singletrack.'],
+  'ride-road': ['How comfortable on the road?','Helps find routes with the right traffic level.'],
+  'ride-ebike': ['E-bike experience?','Some trails have specific e-bike policies.'],
+  'hike-day': ['How often do you hike?','Helps us gauge distance and elevation for you.'],
+  'hike-long': ['Done any long hikes before?','Navigation and prep matter more on big days.'],
+  'hike-dog': ['How adventurous is your pup?','Some trails are tougher on dogs than others.'],
+  'hike-family': ['How old are the kids?','Changes distance and difficulty recommendations a lot.'],
+  'run-trail': ['Trail running experience?','Technical terrain is a different game.'],
+  'run-ultra': ['What distances have you covered?','Need to know your range for route planning.'],
+  'run-mixed': ['Fitness level?','Helps us dial in distance and elevation.'],
+  'run-casual': ['How far do you usually go?','We\'ll match trails to your comfort zone.'],
+  'walk-scenic': ['How far are you up for?','Want to make sure we pick the right length.'],
+  'walk-accessible': ['Any specific needs?','We\'ll find appropriately surfaced trails.'],
+  'walk-nature': ['How much walking do you do?','Helps with distance suggestions.'],
+  'walk-loop': ['How long do you want to be out?','We\'ll find the right size loop.'],
+};
+
+// ── Nav ──
+function goTo(i){
+  const c=document.getElementById(ids[cur]);
+  const n=document.getElementById(ids[i]);
+  c.classList.remove('active'); c.classList.add('exit');
+  setTimeout(()=>c.classList.remove('exit'),500);
+  n.classList.add('active');
+  hist.push(cur); cur=i;
+}
+function goBack(){
+  if(!hist.length) return;
+  const p=hist.pop();
+  const c=document.getElementById(ids[cur]);
+  const prev=document.getElementById(ids[p]);
+  c.classList.remove('active');
+  c.style.cssText='transform:translateX(60px);opacity:0';
+  setTimeout(()=>c.style.cssText='',400);
+  prev.classList.add('active'); prev.classList.remove('exit');
+  cur=p;
+}
+function restart(){
+  S.act=S.spec=S.exp=S.vibe=null; hist=[]; cur=0;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','exit'));
+  document.querySelectorAll('.opt,.g-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('s1').classList.add('active');
+}
+
+// ── Wiring ──
+function wire(id,key,next){
+  document.getElementById(id).addEventListener('click',e=>{
+    const c=e.target.closest('[data-v]'); if(!c) return;
+    c.parentElement.querySelectorAll('[data-v]').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel'); S[key]=c.dataset.v;
+    setTimeout(next,250);
+  });
+}
+
+wire('o1','act',()=>{ buildS2(); goTo(1); });
+wire('o3','exp',()=>{ goTo(3); });
+wire('o4','vibe',()=>{ buildResults(); setTimeout(()=>goTo(4),100); });
+
+function buildS2(){
+  const cfg=specCfg[S.act];
+  document.getElementById('s2-label').textContent=cfg.label;
+  document.getElementById('s2-q').textContent=cfg.q;
+  document.getElementById('s2-sub').textContent=cfg.sub;
+  const box=document.getElementById('s2-box'); box.innerHTML='';
+  if(cfg.grid){
+    let h='<div class="opts-grid" id="o2">';
+    cfg.opts.forEach(o=>h+=`<div class="g-card" data-v="${o.v}"><div class="g-icon">${o.icon}</div><div class="g-label">${o.label}</div><div class="g-sub">${o.sub}</div></div>`);
+    h+='</div>'; box.innerHTML=h;
+  } else {
+    let h='<div class="opts" id="o2">';
+    cfg.opts.forEach(o=>h+=`<div class="opt" data-v="${o.v}"><div class="opt-icon">${o.icon}</div><div class="opt-info"><div class="opt-title">${o.label}</div><div class="opt-desc">${o.desc}</div></div></div>`);
+    h+='</div>'; box.innerHTML=h;
+  }
+  document.getElementById('o2').addEventListener('click',e=>{
+    const c=e.target.closest('[data-v]'); if(!c) return;
+    c.parentElement.querySelectorAll('[data-v]').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel'); S.spec=c.dataset.v;
+    const eq=expQ[S.act+'-'+S.spec]||['How experienced are you?',''];
+    document.getElementById('s3-q').textContent=eq[0];
+    document.getElementById('s3-sub').textContent=eq[1];
+    setTimeout(()=>goTo(2),250);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// RESULTS ENGINE — personalized briefing + trails
+// with human-readable badges instead of map legend
+// ═══════════════════════════════════════════════
+
+function buildResults(){
+  const {act,spec,exp,vibe}=S;
+  const body=document.getElementById('r-body');
+  body.innerHTML='';
+
+  // Tag
+  const actName={ride:'Cycling',hike:'Hiking',run:'Running',walk:'Walking'};
+  const specName={mtb:'MTB',gravel:'Gravel',road:'Road',ebike:'E-Bike',day:'Day Hike',long:'Long Hike',dog:'Dog-Friendly',family:'Family',trail:'Trail',ultra:'Ultra',mixed:'Mixed',casual:'Casual',scenic:'Scenic',accessible:'Accessible',nature:'Nature',loop:'Loop'};
+  document.getElementById('r-tag').textContent=`${actName[act]} · ${specName[spec]}`;
+
+  // Header
+  const hdr=getHeader();
+  document.getElementById('r-title').textContent=hdr[0];
+  document.getElementById('r-sub').textContent=hdr[1];
+
+  // Info cards
+  getCards().forEach(c=>{
+    body.innerHTML+=`<div class="icard ${c.cls}"><div class="icard-head"><div class="icard-ico">${c.ico}</div><div class="icard-title">${c.t}</div></div><p>${c.p}</p></div>`;
+  });
+
+  // Map
+  body.innerHTML+=`
+    <div class="section-title">Your map</div>
+    <div class="map-box">
+      <svg viewBox="0 0 400 200" fill="none">${mapSVG()}</svg>
+      <div class="map-label">Only showing ${specName[spec].toLowerCase()} trails</div>
+    </div>`;
+
+  // Trails
+  body.innerHTML+=`<div class="section-title">Recommended for you</div>`;
+  getTrails().forEach(t=>{
+    const badges=t.badges.map(b=>`<span class="badge badge-${b[1]}">${b[0]}</span>`).join('');
+    const note=t.note?`<div class="trail-note">${t.note}</div>`:'';
+    body.innerHTML+=`
+      <div class="trail">
+        <div class="trail-hero" style="background:linear-gradient(135deg,${t.bg[0]},${t.bg[1]})">${badges}</div>
+        <div class="trail-body">
+          <div class="trail-name">${t.name}</div>
+          <div class="trail-meta">
+            <span>📏 ${t.dist}</span><span>⬆️ ${t.elev}</span><span>⏱️ ${t.time}</span>
+          </div>
+          ${note}
+        </div>
+      </div>`;
+  });
+
+  body.innerHTML+=`<div style="text-align:center;padding:16px 0 60px"><button class="restart" onclick="restart()">Start over</button></div>`;
+}
+
+function getHeader(){
+  const {act,spec,exp,vibe}=S;
+  if(spec==='gravel'&&exp==='first') return ["Your first gravel ride — let's make it a good one.","We picked trails that won't punish you for learning, and flagged the spots to watch out for."];
+  if(spec==='gravel'&&exp==='few') return ["Gravel routes picked for where you're at.","Smoother surfaces, manageable climbs, and we've called out the tricky descents."];
+  if(spec==='gravel'&&exp==='seasoned') return ["Here's what's riding well on gravel right now.","Current conditions, surface notes, and the routes that are actually worth it."];
+  if(spec==='mtb'&&exp==='first') return ["Welcome to mountain biking.","Flow trails and beginner singletrack — nothing that'll send you over the bars."];
+  if(spec==='mtb'&&exp==='seasoned'&&vibe==='challenge') return ["The gnarly stuff that's in shape right now.","Tech trails riding well this week. Conditions current as of today."];
+  if(spec==='mtb'&&exp==='seasoned') return ["Good trails, fresh conditions.","Here's what's worth your time right now."];
+  if(spec==='family') return ["Family-friendly trails nearby.","Short enough for little legs, interesting enough for everyone."];
+  if(spec==='dog') return ["Dog-friendly trails ready to go.","Leash rules, water access, and terrain your pup can handle."];
+  if(act==='hike'&&exp==='few'&&vibe==='challenge') return ["A good push without going overboard.","These trails will challenge you without leaving you miserable."];
+  if(act==='hike'&&vibe==='chill') return ["Mellow trails for a mellow day.","Low key, scenic, easy to follow."];
+  if(spec==='ultra') return ["Big route options for big days.","Segments stitched together with water and bailout points marked."];
+  if(act==='run'&&vibe==='workout') return ["Trails built for effort.","Good climbs, measurable segments, consistent footing."];
+  if(vibe==='adventure') return ["Time to explore.","Trails a bit off the beaten path — that's the point."];
+  if(vibe==='chill') return ["Easy does it.","Low-stress trails that let you enjoy being outside."];
+  return ["Here's your plan.","Tailored to your experience and what you're after today."];
+}
+
+function getCards(){
+  const {act,spec,exp,vibe}=S;
+  const cards=[];
+
+  // Conditions (always)
+  cards.push({cls:'cond',ico:'🌦️',t:'Current conditions',p:'Trails mostly dry. Some mud on north-facing slopes from rain earlier this week. Upper trails above 7,000ft have loose gravel from recent runoff.'});
+
+  if(spec==='gravel'&&(exp==='first'||exp==='few')){
+    cards.push({cls:'warn',ico:'⚠️',t:'Descents to watch',p:'Two recommended trails have steep gravel descents that can wash out under skinny tires. We\'ve tagged them below so you can walk those sections or plan around them.'});
+    cards.push({cls:'tip',ico:'🔧',t:'Tire pressure tip',p:'Drop to 35–40 PSI for these surfaces. You\'ll get way more grip on the loose stuff. Running 38c+ tires? Go even lower.'});
+    cards.push({cls:'tip',ico:'🗺️',t:'Route stitching',p:'These trails connect — we built a suggested loop that keeps you on gravel-friendly surfaces and avoids the chunky rock sections.'});
+  }
+  if(spec==='mtb'&&exp==='first'){
+    cards.push({cls:'tip',ico:'💡',t:'What to expect',p:'These are machine-built flow trails with bermed corners. Keep your weight back on descents and look where you want to go, not at what you want to avoid.'});
+    cards.push({cls:'warn',ico:'⚠️',t:'One-way trails',p:'The trails below are directional. Ride the marked direction only. Pull over if faster riders come up behind you — totally normal.'});
+  }
+  if(spec==='mtb'&&exp==='seasoned'){
+    cards.push({cls:'cond',ico:'📊',t:'Trail status',p:'Chainbreaker just got rehabbed — new rock armoring on the crux. Devil\'s Spine is tacky and fast. Ridgeline closed past mile 3 for erosion work.'});
+  }
+  if(spec==='family'){
+    cards.push({cls:'tip',ico:'🚻',t:'Facilities',p:'All recommended trails have restrooms at the trailhead. Meadow Loop has a picnic area at the halfway point.'});
+    cards.push({cls:'tip',ico:'📱',t:'Cell coverage',p:'Signal on the first two trails. Creek Trail loses coverage in the canyon — grab the offline map before heading out.'});
+  }
+  if(spec==='dog'){
+    cards.push({cls:'warn',ico:'🐕',t:'Leash rules',p:'Riverside requires leashes year-round. Pine Loop is off-leash but has a creek crossing that can run deep after rain — check the trailhead sign.'});
+  }
+  if(act==='hike'&&vibe==='challenge'&&(exp==='few'||exp==='regular')){
+    cards.push({cls:'tip',ico:'📈',t:'Stepping up',p:'These trails have more elevation than you might be used to. Take uphills slow, there\'s no rush. The views at the top are worth it.'});
+  }
+  if(spec==='ultra'){
+    cards.push({cls:'tip',ico:'💧',t:'Water & bailouts',p:'Water sources on the map. Creek crossings at miles 4, 11, and 18 are flowing. Road access at miles 7 and 14 for bail-outs.'});
+  }
+  if(vibe==='workout'&&act==='run'){
+    cards.push({cls:'tip',ico:'📊',t:'Segments',p:'Popular timed segments marked on these trails. Ridge Climb has 847 attempts — current PR is 4:32.'});
+  }
+  return cards;
+}
+
+function mapSVG(){
+  const {spec,exp}=S;
+  const c={e:'#22C55E',m:'#3B82F6',h:'#F97316',x:'#EF4444'};
+  if(spec==='gravel'&&(exp==='first'||exp==='few'))
+    return `<path d="M40 160Q100 140 160 130Q220 120 280 100Q340 80 380 60" stroke="${c.e}" stroke-width="3" stroke-dasharray="8,4"/><path d="M30 180Q80 170 150 155Q250 135 350 110" stroke="${c.m}" stroke-width="3" stroke-dasharray="8,4"/><circle cx="160" cy="130" r="5" fill="${c.e}"/><circle cx="280" cy="100" r="5" fill="${c.e}"/><text x="148" y="118" font-size="9" fill="${c.e}" font-weight="bold">START</text>`;
+  if(spec==='mtb'&&exp==='seasoned')
+    return `<path d="M30 180Q70 100 120 90Q160 80 200 120Q240 160 280 80Q320 30 380 40" stroke="${c.h}" stroke-width="3"/><path d="M50 170Q90 130 140 140Q200 150 250 90Q310 40 370 60" stroke="${c.x}" stroke-width="3"/><circle cx="120" cy="90" r="4" fill="${c.h}"/><circle cx="250" cy="90" r="4" fill="${c.x}"/>`;
+  const p=exp==='seasoned'?c.h:exp==='regular'?c.m:c.e;
+  return `<path d="M30 170Q100 150 170 140Q240 130 310 110Q360 95 390 80" stroke="${p}" stroke-width="3" stroke-dasharray="8,4"/><path d="M40 190Q120 175 200 160Q280 145 370 130" stroke="${c.e}" stroke-width="2.5" stroke-dasharray="8,4"/><circle cx="170" cy="140" r="5" fill="${p}"/><circle cx="310" cy="110" r="5" fill="${p}"/>`;
+}
+
+function getTrails(){
+  const {act,spec,exp,vibe}=S;
+
+  // ── Gravel first-timer / beginner ──
+  if(spec==='gravel'&&(exp==='first'||exp==='few')) return [
+    { name:'Old Mill Fire Road Loop', dist:'12.3 mi', elev:'640 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Beginner friendly','green'],['Packed surface','teal'],['Easy loop','blue']],
+      note:'Smooth packed gravel the whole way. Wide enough to ride side-by-side. Good first gravel ride — nothing surprising.' },
+    { name:'Valley Connector', dist:'8.1 mi', elev:'320 ft', time:'~1 hr',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Beginner friendly','green'],['Easy out & back','blue']],
+      note:'Flat river valley route. The gravel is loose in a few spots but nothing your tires can\'t handle. Turn around whenever you want.' },
+    { name:'Ridge Road to Overlook', dist:'15.7 mi', elev:'1,100 ft', time:'~2 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Worth it for the views','purple'],['Descent can be tricky','orange'],['Might need to dry out','red']],
+      note:'Great ride but the descent at mile 11 is steep loose gravel for about half a mile. Walk it if you\'re not comfortable — no shame, most people do their first time. Recent reports mention mud on the north-facing section around mile 6 — should clear up in a day or two.' },
+  ];
+
+  // ── Gravel seasoned ──
+  if(spec==='gravel'&&exp==='seasoned') return [
+    { name:'Ridgeline Traverse', dist:'42 mi', elev:'3,800 ft', time:'~4 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['All-day epic','purple'],['Technical sections','orange'],['Remote — bring supplies','red']],
+      note:'Proper gravel epic. Mixed surface, some hike-a-bike on the ridge. Water at mile 16 and 28.' },
+    { name:'Canyon Loop', dist:'28 mi', elev:'2,200 ft', time:'~3 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Fast & flowy','teal'],['Steep loose descent','orange']],
+      note:'Riding fast right now — recent grading on the main climb. Descent into the canyon is chunky.' },
+    { name:'Backroads Century Route', dist:'64 mi', elev:'4,600 ft', time:'~6 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Big day','purple'],['Mostly smooth','green'],['Resupply at mi 30','blue']],
+      note:'Links rural backroads through three valleys. Store at the halfway point. Avoid in headwind season.' },
+  ];
+
+  // ── MTB first-timer ──
+  if(spec==='mtb'&&exp==='first') return [
+    { name:'Green Flow', dist:'3.2 mi', elev:'280 ft', time:'~30 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Beginner friendly','green'],['Machine-built flow','teal'],['One-way','gray']],
+      note:'Bermed corners, gentle rolls, wide sightlines. The perfect intro to singletrack. You\'ll want to lap it.' },
+    { name:'Meadow Cruise', dist:'4.8 mi', elev:'190 ft', time:'~45 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Wide & forgiving','green'],['Easy out & back','blue']],
+      note:'Fire road width the whole way. Lets you get used to your bike off-road without any technical surprises.' },
+    { name:'Rollercoaster Jr.', dist:'2.1 mi', elev:'340 ft', time:'~25 min',
+      bg:['#C9B1FF','#7B68EE'],
+      badges:[['Fun rollers','purple'],['Slightly more technical','blue'],['One-way','gray'],['Might need to dry out','red']],
+      note:'Step up from Green Flow — tighter corners, small tabletop jumps (all rollable). Try this after a few laps of the green. A few recent reports mention slick roots on the north side — give it a day if it rained.' },
+  ];
+
+  // ── MTB expert ──
+  if(spec==='mtb'&&exp==='seasoned') return [
+    { name:'Chainbreaker', dist:'5.4 mi', elev:'1,800 ft', time:'~1 hr',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Just rehabbed','teal'],['Technical rock','red'],['Steep exposure','orange']],
+      note:'New rock armoring on the crux — rides way better now. Mandatory line through the rock garden at mile 3. Exposure on the ridge is real.' },
+    { name:"Devil's Spine", dist:'3.8 mi', elev:'1,200 ft', time:'~45 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Riding fast right now','teal'],['Steep & loose','red']],
+      note:'Tacky conditions this week. Upper section is wide open, lower gets tight and rooty. Mandatory drop at the bottom — 4ft, steep landing.' },
+    { name:'Ridgeline Express', dist:'7.2 mi', elev:'2,100 ft', time:'~1.5 hrs',
+      bg:['#6B7280','#374151'],
+      badges:[['Partially closed','red'],['Open to mile 3','gray']],
+      note:'Closed past mile 3 for erosion control. First 3 miles are worth it though — sustained tech climbing with big views. Check back next month for the full trail.' },
+  ];
+
+  // ── Family hike ──
+  if(spec==='family') return [
+    { name:'Meadow Loop', dist:'1.4 mi', elev:'60 ft', time:'~40 min with kids',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Stroller friendly','green'],['Picnic area','blue'],['Restrooms','teal']],
+      note:'Flat, wide, crushed gravel. Picnic tables and a covered shelter at the halfway point. Wildflowers in spring.' },
+    { name:'Discovery Trail', dist:'2.1 mi', elev:'120 ft', time:'~1 hr with kids',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Nature signs for kids','purple'],['Mostly flat','green'],['Easy loop','blue']],
+      note:'Interpretive signs about local plants and animals — kids love the scavenger hunt checklist at the trailhead. One gentle hill.' },
+    { name:'Creekside Walk', dist:'1.8 mi', elev:'80 ft', time:'~45 min',
+      bg:['#C9B1FF','#7B68EE'],
+      badges:[['Water play spot','blue'],['Shaded','teal'],['Easy out & back','green']],
+      note:'Kids can wade at the midpoint where the creek gets shallow and sandy. Entire trail is shaded. Turn back whenever they\'re done.' },
+  ];
+
+  // ── Dog hike ──
+  if(spec==='dog') return [
+    { name:'Pine Loop', dist:'3.2 mi', elev:'320 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Off-leash allowed','green'],['Creek access','blue'],['Easy loop','teal'],['Muddy spots reported','orange']],
+      note:'Off-leash the whole way. Creek crossing at mile 1.5 can run deep after rain — check the trailhead board. Mostly shaded. Recent reports: muddy near the creek crossing, rest of the loop is fine.' },
+    { name:'Riverside Trail', dist:'4.1 mi', elev:'140 ft', time:'~1.5 hrs',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Leash required','orange'],['Flat & wide','green'],['Water access','blue']],
+      note:'Leash required but lots of water access points for your dog. Paved first mile, then packed dirt. Very popular on weekends.' },
+    { name:'Ridgetop Out & Back', dist:'5.6 mi', elev:'900 ft', time:'~2.5 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Off-leash allowed','green'],['Steep in places','orange'],['No water on trail','red']],
+      note:'Great workout for athletic dogs. No water sources — bring extra for your pup. Exposed ridge can be hot in summer.' },
+  ];
+
+  // ── Hike challenge ──
+  if(act==='hike'&&vibe==='challenge') return [
+    { name:'Eagle Peak Trail', dist:'6.4 mi', elev:'1,900 ft', time:'~3.5 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Summit views','purple'],['Sustained climb','orange'],['Well-marked','green']],
+      note:'Steady uphill the whole way — it\'s honest work but the 360° views from the top make it worth every step. Trail is clear and well-cairned.' },
+    { name:'North Ridge Loop', dist:'8.2 mi', elev:'2,400 ft', time:'~5 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Real climb','red'],['Scramble section','orange'],['Not for beginners','gray']],
+      note:'The ridge scramble at mile 5 requires hands — nothing exposed, but you need to be comfortable with it. Rest of the trail is solid hiking.' },
+    { name:'Canyon Traverse', dist:'5.1 mi', elev:'1,100 ft', time:'~3 hrs',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Creek crossings','blue'],['Shaded canyon','teal'],['Moderate challenge','blue'],['Muddy after rain','orange']],
+      note:'Three creek crossings (ankle to knee deep depending on season). The canyon section is gorgeous and cool even in summer. Good intro to harder terrain. Canyon floor stays wet longer than ridgeline trails — expect some mud if it rained in the last 48 hrs.' },
+  ];
+
+  // ── Hike chill ──
+  if(act==='hike'&&vibe==='chill') return [
+    { name:'Lakeside Stroll', dist:'2.4 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Almost flat','green'],['Lake views','blue'],['Benches along the way','teal']],
+      note:'Gentle path around the lake. Benches every quarter mile. The east side has the best morning light for photos.' },
+    { name:'Wildflower Meadow', dist:'1.8 mi', elev:'120 ft', time:'~45 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy loop','green'],['Scenic','purple'],['Stroller OK in dry conditions','teal']],
+      note:'Peak wildflowers in June/July. Gentle rolling terrain through open meadow. There\'s a bench at the top of the small hill with valley views.' },
+    { name:'Old Growth Trail', dist:'3.1 mi', elev:'200 ft', time:'~1.5 hrs',
+      bg:['#52B788','#2D6A4F'],
+      badges:[['Shaded & cool','teal'],['Peaceful','green'],['Easy out & back','blue']],
+      note:'Walk among old growth conifers. Very little elevation, soft trail surface. One of the quieter trails — rarely crowded even on weekends.' },
+  ];
+
+  // ── Ultra ──
+  if(spec==='ultra') return [
+    { name:'Ridgeline Traverse', dist:'26.4 mi', elev:'5,200 ft', time:'~6-8 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['3 water sources','blue'],['Road bailout at mi 7 & 14','orange'],['Exposed ridge — check weather','red']],
+      note:'The big one. Water at miles 4, 11, 18. Emergency road access at miles 7 and 14. Exposed above treeline for miles 8-15 — bail early if weather turns.' },
+    { name:'Valley to Peak Loop', dist:'18.7 mi', elev:'3,800 ft', time:'~4-6 hrs',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Mostly runnable','green'],['One big climb','orange'],['Well-marked','teal']],
+      note:'Fast valley running for first 7 miles, then a 2,400ft climb to the peak, fast descent home. The climb is relentless but never technical.' },
+    { name:'Creek Corridor', dist:'31.2 mi', elev:'4,100 ft', time:'~7-9 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Gentle grade','green'],['Many water crossings','blue'],['Rarely marked — nav skills needed','orange'],['Trail might need to dry out','red']],
+      note:'Follows the creek drainage for 31 miles. Gentle grade but the crossings add up — expect wet feet all day. Trail markings fade past mile 20, bring a GPS track. Multiple reports from this week say the lower section is boggy — consider waiting a few days.' },
+  ];
+
+  // ── Run workout ──
+  if(act==='run'&&vibe==='workout') return [
+    { name:'Ridge Climb Repeats', dist:'4.2 mi', elev:'1,400 ft', time:'~45 min',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Strava segment','purple'],['Sustained steep','red'],['PR: 4:32','gray']],
+      note:'847 attempts on the main Strava segment. Steep the whole way, good footing. Most people do 2-3 laps. The record was set in October — prime conditions.' },
+    { name:'Tempo Loop', dist:'6.8 mi', elev:'480 ft', time:'~50 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Fast & runnable','green'],['Rolling terrain','blue'],['Popular loop','teal']],
+      note:'The go-to tempo loop for locals. Smooth trail, gentle rolls, enough elevation to keep you honest. Run it clockwise for the better descent finish.' },
+    { name:'Hill Sprint Path', dist:'2.4 mi', elev:'600 ft', time:'~25 min',
+      bg:['#C1121F','#780000'],
+      badges:[['Quad burner','red'],['Short & steep','orange'],['Great for intervals','purple']],
+      note:'Half a mile up, half a mile down, repeat. The grade is 15-20% the whole way. Locals use it for hill repeat workouts — 4 laps is a solid session.' },
+  ];
+
+  // ── Run casual ──
+  if(act==='run'&&spec==='casual') return [
+    { name:'Riverside Path', dist:'3.4 mi', elev:'60 ft', time:'~30 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Flat & smooth','green'],['Scenic','purple'],['Easy out & back','blue']],
+      note:'Paved path along the river. Flat, shaded, beautiful. Turn around whenever you want — it\'s an out and back.' },
+    { name:'Park Loop', dist:'2.2 mi', elev:'90 ft', time:'~20 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy loop','green'],['Restrooms','teal'],['Well-lit','blue']],
+      note:'Gentle loop through the park. Crushed gravel, flat, restrooms at the start. Fine for early morning or evening runs — partly lit.' },
+    { name:'Orchard Trail', dist:'4.1 mi', elev:'180 ft', time:'~40 min',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Gentle hills','blue'],['Shaded','teal'],['Soft surface','green']],
+      note:'Winds through old orchard land. Soft dirt trail, gentle rollers. The shade makes it great for warm days. A little longer but never hard.' },
+  ];
+
+  // ── Walk scenic ──
+  if(act==='walk'&&spec==='scenic') return [
+    { name:'Overlook Point Trail', dist:'1.6 mi', elev:'240 ft', time:'~45 min',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Best viewpoint nearby','purple'],['Short climb','blue'],['Bench at the top','teal']],
+      note:'Quick walk up to a panoramic viewpoint. The climb is short and the bench at the top lets you take it all in. Best light in the morning.' },
+    { name:'Waterfall Walk', dist:'2.3 mi', elev:'180 ft', time:'~1 hr',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Waterfall at the end','purple'],['Easy out & back','green'],['Shaded','teal']],
+      note:'Nice payoff hike — easy walk through forest to a 40ft waterfall. Best flow in spring but pretty year-round. Gets busy on weekends.' },
+    { name:'Sunset Ridge', dist:'1.9 mi', elev:'300 ft', time:'~50 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Best sunset spot','purple'],['Short climb','blue'],['Wide trail','green']],
+      note:'The locals\' sunset spot. West-facing ridge with unobstructed views. The walk up is easy and the trail is wide enough for groups.' },
+  ];
+
+  // ── Default ──
+  return [
+    { name:'Sunset Ridge Trail', dist:'4.6 mi', elev:'720 ft', time:'~2 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Great views','purple'],['Moderate effort','blue']],
+      note:'A solid all-around trail. Enough climb to feel it, great views from the ridge, easy to follow.' },
+    { name:'Creekside Path', dist:'2.8 mi', elev:'180 ft', time:'~1 hr',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy & shaded','green'],['Flat','teal']],
+      note:'Relaxed walk along the creek. Shaded, flat, and peaceful.' },
+    { name:'Pine Loop', dist:'5.3 mi', elev:'540 ft', time:'~2.5 hrs',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Nice loop','blue'],['Some climbing','blue']],
+      note:'Good loop with moderate climbing. Well-maintained trail through pines.' },
+  ];
+}
+</script>
+</body>
+</html>
