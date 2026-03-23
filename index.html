@@ -166,17 +166,22 @@
 
   /* ── Map placeholder ── */
   .map-box {
-    background: linear-gradient(145deg, #D8F3DC, #B7E4C7, #95D5B2);
-    border-radius: var(--radius); height: 200px;
+    background: linear-gradient(160deg, #E8F5E9 0%, #C8E6C9 50%, #B2DFDB 100%);
+    border-radius: var(--radius); height: 130px;
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
   }
   .map-box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .map-label {
-    font-size: 14px; font-weight: 600; color: var(--green);
-    background: rgba(255,255,255,0.85); padding: 8px 16px;
+    font-size: 13px; font-weight: 600; color: var(--green);
+    background: rgba(255,255,255,0.9); padding: 6px 14px;
     border-radius: 10px; z-index: 1;
   }
+  /* ── Snow activity tint ── */
+  .map-box.snow {
+    background: linear-gradient(160deg, #E3F2FD 0%, #BBDEFB 50%, #B2EBF2 100%);
+  }
+  .map-box.snow .map-label { color: #1565C0; }
 
   .restart {
     margin: 8px auto 60px; padding: 12px 24px;
@@ -204,10 +209,11 @@
     <div class="q-sub">We'll figure out what you need from there.</div>
   </div>
   <div class="opts" id="o1">
-    <div class="opt" data-v="ride"><div class="opt-icon">🚲</div><div class="opt-info"><div class="opt-title">Ride</div><div class="opt-desc">Mountain, gravel, road — any kind</div></div></div>
+    <div class="opt" data-v="ride"><div class="opt-icon">🚵</div><div class="opt-info"><div class="opt-title">Ride</div><div class="opt-desc">Mountain bike, gravel, e-bike, moto or ATV</div></div></div>
     <div class="opt" data-v="hike"><div class="opt-icon">🥾</div><div class="opt-info"><div class="opt-title">Hike</div><div class="opt-desc">Get out on foot, find a trail</div></div></div>
-    <div class="opt" data-v="run"><div class="opt-icon">🏃</div><div class="opt-info"><div class="opt-title">Run</div><div class="opt-desc">Trail running, all terrain</div></div></div>
-    <div class="opt" data-v="walk"><div class="opt-icon">🌿</div><div class="opt-info"><div class="opt-title">Walk / Explore</div><div class="opt-desc">Casual, scenic, accessible</div></div></div>
+    <div class="opt" data-v="run"><div class="opt-icon">🏃</div><div class="opt-info"><div class="opt-title">Run</div><div class="opt-desc">Trail running on dirt and singletrack</div></div></div>
+    <div class="opt" data-v="snow"><div class="opt-icon">⛄</div><div class="opt-info"><div class="opt-title">Snow</div><div class="opt-desc">Ski, snowshoe, fat bike, snowboard</div></div></div>
+    <div class="opt" data-v="walk"><div class="opt-icon">🌿</div><div class="opt-info"><div class="opt-title">Walk / Explore</div><div class="opt-desc">Casual, scenic, easy paths</div></div></div>
   </div>
 </div>
 
@@ -297,8 +303,20 @@ const specCfg = {
     opts: [
       { v:'mtb', icon:'🏔️', label:'Mountain bike', sub:'Full sus or hardtail' },
       { v:'gravel', icon:'🛤️', label:'Gravel bike', sub:'Drop bars, wider tires' },
-      { v:'road', icon:'🚴', label:'Road bike', sub:'Pavement & smooth paths' },
       { v:'ebike', icon:'⚡', label:'E-bike', sub:'Pedal-assist, any style' },
+      { v:'moto', icon:'🏍️', label:'Dirt bike / Moto', sub:'Single-track, enduros' },
+      { v:'atv', icon:'🚗', label:'ATV / Side-by-side', sub:'4-wheel off-road' },
+    ]
+  },
+  snow: {
+    label: 'Snow gear', q: 'How are you getting out there?',
+    sub: 'Different gear means different terrain and trail types.',
+    grid: true,
+    opts: [
+      { v:'xc', icon:'⛷️', label:'Nordic / XC ski', sub:'Groomed or backcountry' },
+      { v:'snowshoe', icon:'🧊', label:'Snowshoe', sub:'Any winter hiker welcome' },
+      { v:'fatbike', icon:'🚵', label:'Fat bike', sub:'Riding on snow and ice' },
+      { v:'backcountry', icon:'🏔️', label:'Backcountry ski', sub:'Touring, ski mountaineering' },
     ]
   },
   hike: {
@@ -336,17 +354,22 @@ const specCfg = {
 // ── Experience question customization ──
 const expQ = {
   'ride-mtb': ['How much mountain biking have you done?','No judgment — helps us filter technical trails.'],
-  'ride-gravel': ['How new are you to gravel?','Gravel ranges from smooth fire roads to sketchy singletrack.'],
-  'ride-road': ['How comfortable on the road?','Helps find routes with the right traffic level.'],
-  'ride-ebike': ['E-bike experience?','Some trails have specific e-bike policies.'],
-  'hike-day': ['How often do you hike?','Helps us gauge distance and elevation for you.'],
+  'ride-gravel': ['How new are you to gravel?','Gravel ranges from smooth fire roads to rough singletrack.'],
+  'ride-ebike': ['E-bike experience?','Some trails have specific e-bike access rules.'],
+  'ride-moto': ['How long have you been riding?','Helps us match trail difficulty and tech level.'],
+  'ride-atv': ['How much off-road ATV time do you have?','Route widths and terrain type depend on your comfort level.'],
+  'hike-day': ['How often do you hike?','Helps us gauge distance and terrain for you.'],
   'hike-long': ['Done any long hikes before?','Navigation and prep matter more on big days.'],
   'hike-dog': ['How adventurous is your pup?','Some trails are tougher on dogs than others.'],
   'hike-family': ['How old are the kids?','Changes distance and difficulty recommendations a lot.'],
-  'run-trail': ['Trail running experience?','Technical terrain is a different game.'],
+  'run-trail': ['Trail running experience?','Technical terrain is a different game from road running.'],
   'run-ultra': ['What distances have you covered?','Need to know your range for route planning.'],
-  'run-mixed': ['Fitness level?','Helps us dial in distance and elevation.'],
+  'run-mixed': ['Fitness level?','Helps us dial in distance and effort.'],
   'run-casual': ['How far do you usually go?','We\'ll match trails to your comfort zone.'],
+  'snow-xc': ['Nordic skiing experience?','Groomed vs backcountry is a big difference.'],
+  'snow-snowshoe': ['Snowshoed before?','Helps us pick the right distance and terrain.'],
+  'snow-fatbike': ['Fat biking experience?','Snow riding has its own quirks — good to know where you\'re at.'],
+  'snow-backcountry': ['How much backcountry time do you have?','Avalanche terrain, navigation, and fitness all factor in.'],
   'walk-scenic': ['How far are you up for?','Want to make sure we pick the right length.'],
   'walk-accessible': ['Any specific needs?','We\'ll find appropriately surfaced trails.'],
   'walk-nature': ['How much walking do you do?','Helps with distance suggestions.'],
@@ -431,8 +454,8 @@ function buildResults(){
   body.innerHTML='';
 
   // Tag
-  const actName={ride:'Cycling',hike:'Hiking',run:'Running',walk:'Walking'};
-  const specName={mtb:'MTB',gravel:'Gravel',road:'Road',ebike:'E-Bike',day:'Day Hike',long:'Long Hike',dog:'Dog-Friendly',family:'Family',trail:'Trail',ultra:'Ultra',mixed:'Mixed',casual:'Casual',scenic:'Scenic',accessible:'Accessible',nature:'Nature',loop:'Loop'};
+  const actName={ride:'Cycling',hike:'Hiking',run:'Running',walk:'Walking',snow:'Snow'};
+  const specName={mtb:'MTB',gravel:'Gravel',ebike:'E-Bike',moto:'Moto',atv:'ATV',day:'Day Hike',long:'Long Hike',dog:'Dog-Friendly',family:'Family',trail:'Trail',ultra:'Ultra',mixed:'Mixed',casual:'Casual',scenic:'Scenic',accessible:'Accessible',nature:'Nature',loop:'Loop',xc:'Nordic / XC',snowshoe:'Snowshoe',fatbike:'Fat Bike',backcountry:'Backcountry Ski'};
   document.getElementById('r-tag').textContent=`${actName[act]} · ${specName[spec]}`;
 
   // Header
@@ -446,11 +469,12 @@ function buildResults(){
   });
 
   // Map
+  const snowClass = act==='snow' ? ' snow' : '';
   body.innerHTML+=`
     <div class="section-title">Your map</div>
-    <div class="map-box">
-      <svg viewBox="0 0 400 200" fill="none">${mapSVG()}</svg>
-      <div class="map-label">Only showing ${specName[spec].toLowerCase()} trails</div>
+    <div class="map-box${snowClass}">
+      <svg viewBox="0 0 400 130" fill="none">${mapSVG()}</svg>
+      <div class="map-label">Filtered for ${specName[spec]}</div>
     </div>`;
 
   // Trails
@@ -476,19 +500,37 @@ function buildResults(){
 
 function getHeader(){
   const {act,spec,exp,vibe}=S;
+  // Snow
+  if(spec==='snowshoe'&&exp==='first') return ["First time snowshoeing? Perfect.","We picked short, well-marked routes where you can get the hang of it without getting in over your head."];
+  if(spec==='snowshoe') return ["Good snowshoe routes for today.","Matched to your experience and what the trails are doing right now."];
+  if(spec==='xc'&&exp==='first') return ["Starting Nordic skiing — here's a gentle on-ramp.","Groomed, flat routes where you can find your balance before anything tricky."];
+  if(spec==='xc'&&exp==='seasoned') return ["Best XC routes riding well right now.","Groomed conditions, recent reports, and the trails worth your time today."];
+  if(spec==='xc') return ["Nordic routes matched to where you're at.","We've kept it manageable and flagged anything to know about."];
+  if(spec==='fatbike'&&exp==='first') return ["Fat biking on snow is its own thing — we'll keep it simple.","Packed trails, easy grades, and no surprises for your first time."];
+  if(spec==='fatbike') return ["Fat bike routes in shape right now.","Snow conditions matter a lot — we've pulled the freshest reports."];
+  if(spec==='backcountry'&&exp==='first') return ["Heads up — backcountry deserves serious prep.","We've listed beginner-appropriate routes, but check avalanche conditions before you go."];
+  if(spec==='backcountry') return ["Backcountry lines worth the effort right now.","Current snowpack, recent tracks, and routes people are actually skiing."];
+  // Moto / ATV
+  if(spec==='moto'&&exp==='first') return ["First time on a dirt bike? We'll start you right.","Wide, forgiving trails with good visibility — nowhere technical to catch you out."];
+  if(spec==='moto') return ["Moto trails worth riding this week.","Trail surface reports, access notes, and the routes people are enjoying right now."];
+  if(spec==='atv') return ["ATV and side-by-side routes near you.","Width limits, surface type, and current access — all checked."];
+  // Bike
   if(spec==='gravel'&&exp==='first') return ["Your first gravel ride — let's make it a good one.","We picked trails that won't punish you for learning, and flagged the spots to watch out for."];
   if(spec==='gravel'&&exp==='few') return ["Gravel routes picked for where you're at.","Smoother surfaces, manageable climbs, and we've called out the tricky descents."];
   if(spec==='gravel'&&exp==='seasoned') return ["Here's what's riding well on gravel right now.","Current conditions, surface notes, and the routes that are actually worth it."];
   if(spec==='mtb'&&exp==='first') return ["Welcome to mountain biking.","Flow trails and beginner singletrack — nothing that'll send you over the bars."];
   if(spec==='mtb'&&exp==='seasoned'&&vibe==='challenge') return ["The gnarly stuff that's in shape right now.","Tech trails riding well this week. Conditions current as of today."];
   if(spec==='mtb'&&exp==='seasoned') return ["Good trails, fresh conditions.","Here's what's worth your time right now."];
+  if(spec==='ebike'&&exp==='first') return ["E-bikes open up more trail than you'd think.","We've checked access rules and picked routes where e-bikes are fully welcome."];
+  if(spec==='ebike') return ["E-bike routes with current access confirmed.","Some trails have restrictions — we've filtered those out."];
+  // Hike / run / walk
   if(spec==='family') return ["Family-friendly trails nearby.","Short enough for little legs, interesting enough for everyone."];
   if(spec==='dog') return ["Dog-friendly trails ready to go.","Leash rules, water access, and terrain your pup can handle."];
   if(act==='hike'&&exp==='few'&&vibe==='challenge') return ["A good push without going overboard.","These trails will challenge you without leaving you miserable."];
   if(act==='hike'&&vibe==='chill') return ["Mellow trails for a mellow day.","Low key, scenic, easy to follow."];
   if(spec==='ultra') return ["Big route options for big days.","Segments stitched together with water and bailout points marked."];
   if(act==='run'&&vibe==='workout') return ["Trails built for effort.","Good climbs, measurable segments, consistent footing."];
-  if(vibe==='adventure') return ["Time to explore.","Trails a bit off the beaten path — that's the point."];
+  if(vibe==='adventure') return ["Time to explore somewhere new.","A bit off the beaten path — that's the whole point."];
   if(vibe==='chill') return ["Easy does it.","Low-stress trails that let you enjoy being outside."];
   return ["Here's your plan.","Tailored to your experience and what you're after today."];
 }
@@ -497,8 +539,12 @@ function getCards(){
   const {act,spec,exp,vibe}=S;
   const cards=[];
 
-  // Conditions (always)
-  cards.push({cls:'cond',ico:'🌦️',t:'Current conditions',p:'Trails mostly dry. Some mud on north-facing slopes from rain earlier this week. Upper trails above 7,000ft have loose gravel from recent runoff.'});
+  // Conditions (always, varies by activity)
+  if(act==='snow'){
+    cards.push({cls:'cond',ico:'❄️',t:'Snow conditions',p:'Base is solid at elevation. Lower trails are thin in spots after last week\'s warmth. 6–8" of fresh snow above 5,500ft. Grooming was done yesterday on the main nordic loops.'});
+  } else {
+    cards.push({cls:'cond',ico:'🌦️',t:'Current conditions',p:'Trails mostly dry. Some mud on north-facing slopes from rain earlier this week. Upper trails above 7,000ft have loose gravel from recent runoff.'});
+  }
 
   if(spec==='gravel'&&(exp==='first'||exp==='few')){
     cards.push({cls:'warn',ico:'⚠️',t:'Descents to watch',p:'Two recommended trails have steep gravel descents that can wash out under skinny tires. We\'ve tagged them below so you can walk those sections or plan around them.'});
@@ -511,6 +557,32 @@ function getCards(){
   }
   if(spec==='mtb'&&exp==='seasoned'){
     cards.push({cls:'cond',ico:'📊',t:'Trail status',p:'Chainbreaker just got rehabbed — new rock armoring on the crux. Devil\'s Spine is tacky and fast. Ridgeline closed past mile 3 for erosion work.'});
+  }
+  if(spec==='ebike'){
+    cards.push({cls:'warn',ico:'⚠️',t:'E-bike access rules',p:'Class 1 e-bikes allowed on all trails below. Class 2 & 3 restricted to fire roads and shared-use paths — marked on each trail. Check signage at trailheads.'});
+  }
+  if(spec==='moto'){
+    cards.push({cls:'warn',ico:'🪪',t:'Permit & registration',p:'All routes below are on legal OHV areas. Bring your registration. Green sticker required for two-stroke bikes in this region. Day pass available at the kiosk.'});
+    cards.push({cls:'cond',ico:'🛤️',t:'Trail surface',p:'Main loop is hardpack and in good shape. East connector has some loose rock after last week\'s rain. South ridge is dusty — traction is fine but visibility can be low with others ahead.'});
+  }
+  if(spec==='atv'){
+    cards.push({cls:'warn',ico:'🪪',t:'Access & permits',p:'OHV permit required. All routes below are rated for full-size ATVs. Narrow trail markers indicate ATV-width clearance — side-by-sides should stick to the wider routes.'});
+    cards.push({cls:'tip',ico:'📡',t:'Cell coverage',p:'No signal past the first trailhead. Download offline maps before heading out. Emergency contact point is at the parking area.'});
+  }
+  // Snow-specific cards
+  if(spec==='backcountry'){
+    cards.push({cls:'warn',ico:'⚠️',t:'Avalanche conditions',p:'Moderate danger at treeline and above today. Recent wind loading on north and east aspects. Check the local avalanche center forecast before heading out — conditions can change fast.'});
+    cards.push({cls:'tip',ico:'🎒',t:'Gear check',p:'Beacon, probe, and shovel are essential. All three, every time. Tell someone your plan and expected return time.'});
+  }
+  if(spec==='xc'&&exp==='first'){
+    cards.push({cls:'tip',ico:'💡',t:'Getting started',p:'Kick-and-glide is the basic move. Don\'t fight the skis — let them slide. Groomed trails have tracks set for your skis, just step in and go.'});
+  }
+  if(spec==='snowshoe'&&exp==='first'){
+    cards.push({cls:'tip',ico:'💡',t:'First time out',p:'Snowshoes are intuitive — walk normally, just wider stance. Tighten your bindings before the trailhead. Poles help a lot on any incline.'});
+  }
+  if(spec==='fatbike'){
+    cards.push({cls:'tip',ico:'🔧',t:'Tire pressure',p:'Run 5–8 PSI for best float on packed snow. Too firm and you\'ll bounce off hard ice; too soft and you\'ll sink in fresh. Most riders go lower than they expect.'});
+    cards.push({cls:'cond',ico:'❄️',t:'Best conditions today',p:'Groomed loop is perfect — packed corduroy from last night. Ungroomed singletrack has 4" of fresh on top of a firm base. Avoid the lake trail, thin ice reported.'});
   }
   if(spec==='family'){
     cards.push({cls:'tip',ico:'🚻',t:'Facilities',p:'All recommended trails have restrooms at the trailhead. Meadow Loop has a picnic area at the halfway point.'});
@@ -532,14 +604,36 @@ function getCards(){
 }
 
 function mapSVG(){
-  const {spec,exp}=S;
-  const c={e:'#22C55E',m:'#3B82F6',h:'#F97316',x:'#EF4444'};
-  if(spec==='gravel'&&(exp==='first'||exp==='few'))
-    return `<path d="M40 160Q100 140 160 130Q220 120 280 100Q340 80 380 60" stroke="${c.e}" stroke-width="3" stroke-dasharray="8,4"/><path d="M30 180Q80 170 150 155Q250 135 350 110" stroke="${c.m}" stroke-width="3" stroke-dasharray="8,4"/><circle cx="160" cy="130" r="5" fill="${c.e}"/><circle cx="280" cy="100" r="5" fill="${c.e}"/><text x="148" y="118" font-size="9" fill="${c.e}" font-weight="bold">START</text>`;
+  const {act,spec,exp}=S;
+  const g='#22C55E', o='#F97316', r='#EF4444', b='#3B82F6', s='#60A5FA';
+  // Snow: simple terrain silhouette with marked zones
+  if(act==='snow'){
+    const color=spec==='backcountry'?o:s;
+    return `<path d="M0 90Q80 70 160 55Q240 40 320 50Q370 55 400 45" stroke="${color}" stroke-width="2.5" stroke-dasharray="6,3" fill="none"/>
+      <path d="M0 110Q60 100 140 95Q220 90 300 85Q360 82 400 80" stroke="${g}" stroke-width="2.5" stroke-dasharray="6,3" fill="none"/>
+      <circle cx="140" cy="95" r="5" fill="${color}"/>
+      <circle cx="300" cy="85" r="5" fill="${g}"/>
+      <circle cx="220" cy="72" r="4" fill="${color}" opacity="0.6"/>`;
+  }
+  // Moto / ATV: wider dashed tracks
+  if(spec==='moto'||spec==='atv'){
+    return `<path d="M20 100Q90 85 170 80Q250 75 330 65Q375 60 395 55" stroke="${o}" stroke-width="3" stroke-dasharray="10,4" fill="none"/>
+      <path d="M20 115Q100 108 190 105Q280 102 360 95" stroke="${g}" stroke-width="2.5" stroke-dasharray="10,4" fill="none"/>
+      <circle cx="170" cy="80" r="5" fill="${o}"/>
+      <circle cx="330" cy="65" r="5" fill="${o}"/>`;
+  }
+  // MTB expert
   if(spec==='mtb'&&exp==='seasoned')
-    return `<path d="M30 180Q70 100 120 90Q160 80 200 120Q240 160 280 80Q320 30 380 40" stroke="${c.h}" stroke-width="3"/><path d="M50 170Q90 130 140 140Q200 150 250 90Q310 40 370 60" stroke="${c.x}" stroke-width="3"/><circle cx="120" cy="90" r="4" fill="${c.h}"/><circle cx="250" cy="90" r="4" fill="${c.x}"/>`;
-  const p=exp==='seasoned'?c.h:exp==='regular'?c.m:c.e;
-  return `<path d="M30 170Q100 150 170 140Q240 130 310 110Q360 95 390 80" stroke="${p}" stroke-width="3" stroke-dasharray="8,4"/><path d="M40 190Q120 175 200 160Q280 145 370 130" stroke="${c.e}" stroke-width="2.5" stroke-dasharray="8,4"/><circle cx="170" cy="140" r="5" fill="${p}"/><circle cx="310" cy="110" r="5" fill="${p}"/>`;
+    return `<path d="M25 115Q70 75 120 65Q165 55 200 85Q235 115 275 60Q315 20 390 30" stroke="${r}" stroke-width="2.5" fill="none"/>
+      <path d="M40 120Q85 95 135 100Q195 108 245 65Q305 25 375 42" stroke="${o}" stroke-width="2.5" fill="none"/>
+      <circle cx="120" cy="65" r="5" fill="${r}"/>
+      <circle cx="245" cy="65" r="5" fill="${o}"/>`;
+  // Default / beginner-friendly
+  const p=exp==='seasoned'?o:exp==='regular'?b:g;
+  return `<path d="M25 105Q100 92 175 85Q255 78 330 68Q375 62 395 55" stroke="${p}" stroke-width="2.5" stroke-dasharray="7,3" fill="none"/>
+    <path d="M25 118Q110 110 200 105Q290 100 380 92" stroke="${g}" stroke-width="2" stroke-dasharray="7,3" fill="none"/>
+    <circle cx="175" cy="85" r="5" fill="${p}"/>
+    <circle cx="330" cy="68" r="5" fill="${p}"/>`;
 }
 
 function getTrails(){
@@ -735,6 +829,154 @@ function getTrails(){
       bg:['#F4A261','#E76F51'],
       badges:[['Best sunset spot','purple'],['Short climb','blue'],['Wide trail','green']],
       note:'The locals\' sunset spot. West-facing ridge with unobstructed views. The walk up is easy and the trail is wide enough for groups.' },
+  ];
+
+  // ── Moto ──
+  if(spec==='moto'&&exp==='first') return [
+    { name:'Beginner OHV Loop', dist:'6 mi', elev:'400 ft', time:'~1 hr',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Wide & forgiving','green'],['No technical sections','teal'],['Well-signed','blue']],
+      note:'Broad dirt track with good sightlines. Nothing technical — great place to build confidence. Speed limits posted, respect them.' },
+    { name:'Pine Flat Fire Road', dist:'4.2 mi', elev:'180 ft', time:'~40 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Easy out & back','green'],['Hardpack','teal']],
+      note:'Smooth hardpack fire road, almost no surprises. Good place to practice slow-speed control and get comfortable with your bike.' },
+    { name:'Valley OHV Access Route', dist:'8.1 mi', elev:'520 ft', time:'~1.5 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['One technical corner','orange'],['Mostly easy','green'],['Connects to main system','blue']],
+      note:'Mostly easy with one slightly off-camber corner around mile 5. Take it slow the first time. Links you into the full OHV network if you want to explore further.' },
+  ];
+  if(spec==='moto') return [
+    { name:'Ridgeback Enduro Loop', dist:'18 mi', elev:'2,400 ft', time:'~2.5 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Singletrack','red'],['Technical rock sections','orange'],['Riding well right now','teal']],
+      note:'Classic local enduro loop. Rock gardens at miles 6 and 13 — both rideable but deserve respect. Tacky conditions on the upper section this week.' },
+    { name:'South Fork Trail', dist:'11 mi', elev:'1,200 ft', time:'~1.5 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Fast & flowy','teal'],['Some loose corners','orange'],['Popular loop','blue']],
+      note:'Fast, flowy singletrack with a few loose downhill corners. The best part of the local system for most riders. Starts easy, gets more interesting.' },
+    { name:'East Mesa Connector', dist:'24 mi', elev:'3,100 ft', time:'~3 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Full day option','purple'],['Mixed terrain','blue'],['Remote — fuel up','orange']],
+      note:'Links three trail systems over the mesa. Half dirt road, half singletrack. No services out there — bring extra fuel and water.' },
+  ];
+
+  // ── ATV ──
+  if(spec==='atv') return [
+    { name:'Mesa Verde OHV Route', dist:'14 mi', elev:'800 ft', time:'~2 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['ATV & side-by-side friendly','green'],['Wide trail','teal'],['Scenic overlook at mi 7','purple']],
+      note:'Well-maintained ATV route with great views at the halfway point. Hardpack with some loose sections on the descents. Suitable for most side-by-sides.' },
+    { name:'Dry Creek Basin Loop', dist:'22 mi', elev:'1,400 ft', time:'~3 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Loop route','blue'],['Rocky in spots','orange'],['Water crossing','teal']],
+      note:'Big loop through high desert. Rocky patches on the north side — manageable, just slow down. Shallow water crossing at mile 16, usually a foot deep or less.' },
+    { name:'Pinyon Ridge Connector', dist:'9 mi', elev:'600 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Shorter option','green'],['Good surface','teal'],['Links to Mesa Verde','blue']],
+      note:'Good introductory route for this area. Well-graded hardpack, nothing surprising. Can link to Mesa Verde OHV Route if you want a longer day.' },
+  ];
+
+  // ── Snowshoe beginner ──
+  if(spec==='snowshoe'&&(exp==='first'||exp==='few')) return [
+    { name:'Lower Meadow Loop', dist:'2.1 mi', elev:'120 ft', time:'~1.5 hrs on snow',
+      bg:['#BBDEFB','#90CAF9'],
+      badges:[['Perfect for first-timers','green'],['Flat & open','teal'],['Well-marked','blue']],
+      note:'Wide open meadow route, impossible to get lost. Flat enough to focus on getting comfortable with the snowshoes. Groomed track you can follow if you want.' },
+    { name:'Forest Walk Trail', dist:'3.4 mi', elev:'280 ft', time:'~2 hrs',
+      bg:['#B2EBF2','#80DEEA'],
+      badges:[['Tree cover','teal'],['Gentle hills','green'],['Quiet on weekdays','blue']],
+      note:'Sheltered forest trail with a few small hills. Snowshoe tracks from other users make it easy to follow. The trees keep the snow in better shape longer.' },
+    { name:'Lakeview Out & Back', dist:'2.8 mi', elev:'160 ft', time:'~2 hrs',
+      bg:['#E3F2FD','#BBDEFB'],
+      badges:[['Lake views at the end','purple'],['Easy terrain','green'],['Turn back anytime','blue']],
+      note:'Gradual walk to a frozen lake overlook. You set the pace and turn around whenever you feel like it. The view at the end is worth it if you make it.' },
+  ];
+
+  // ── Snowshoe experienced ──
+  if(spec==='snowshoe') return [
+    { name:'Ridgeline Snowshoe Route', dist:'6.2 mi', elev:'1,400 ft', time:'~3.5 hrs',
+      bg:['#90CAF9','#42A5F5'],
+      badges:[['Open ridge','purple'],['Sustained climb','orange'],['360° views at top','teal']],
+      note:'Big climb to the ridge — steady, not technical. The views from the top are the payoff. Wind can pick up on the exposed section, bring layers.' },
+    { name:'Backcountry Creek Route', dist:'8.1 mi', elev:'900 ft', time:'~4 hrs',
+      bg:['#B2EBF2','#4DD0E1'],
+      badges:[['Untracked terrain','purple'],['Navigation needed','orange'],['Water access','blue']],
+      note:'Follows a creek drainage through untracked terrain. No marked trail — bring a GPS track or be comfortable with a map. Rewarding solitude.' },
+    { name:'Summit Connector', dist:'4.6 mi', elev:'1,100 ft', time:'~2.5 hrs',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Summit access','purple'],['Moderate climb','blue'],['Can add on to Ridge route','teal']],
+      note:'Gets you to the summit plateau on a well-traveled line. Can connect to the Ridgeline route for a bigger day if you have the legs for it.' },
+  ];
+
+  // ── Nordic / XC ski ──
+  if(spec==='xc'&&(exp==='first'||exp==='few')) return [
+    { name:'Groomed Beginner Loop', dist:'3.2 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#E3F2FD','#BBDEFB'],
+      badges:[['Track set','green'],['Flat','teal'],['Ski rental nearby','blue']],
+      note:'Track-set groomed loop on a mostly flat meadow. Perfect for learning kick and glide without worrying about hills. Rental shop at the trailhead.' },
+    { name:'Valley Nordic Trail', dist:'5.1 mi', elev:'200 ft', time:'~1.5 hrs',
+      bg:['#B2EBF2','#80DEEA'],
+      badges:[['Groomed','green'],['Gentle rollers','blue'],['Well-marked','teal']],
+      note:'Gentle terrain with a few small hills to practice your snowplow on. Well-signed intersections. The classic beginner progression from the flat loop.' },
+  ];
+  if(spec==='xc') return [
+    { name:'Ridgeline XC Route', dist:'12.4 mi', elev:'1,200 ft', time:'~3 hrs',
+      bg:['#90CAF9','#42A5F5'],
+      badges:[['Classic loop','purple'],['Some steep descents','orange'],['Groomed upper section','green']],
+      note:'The go-to XC route. Groomed on the upper half, backcountry below. The descent into the valley is the highlight — long, fast, and well-packed right now.' },
+    { name:'Backcountry Nordic Circuit', dist:'16.8 mi', elev:'2,100 ft', time:'~5 hrs',
+      bg:['#BBDEFB','#64B5F6'],
+      badges:[['Ungroomed backcountry','orange'],['Full day','purple'],['Navigation skills needed','red']],
+      note:'Ungroomed route through the backcountry. Fresh snow from two days ago is in great shape. Bring a GPS track — trail markers can be buried under heavy snow.' },
+  ];
+
+  // ── Fat bike ──
+  if(spec==='fatbike'&&(exp==='first'||exp==='few')) return [
+    { name:'Groomed Fat Bike Loop', dist:'4.1 mi', elev:'140 ft', time:'~45 min',
+      bg:['#B2EBF2','#4DD0E1'],
+      badges:[['Groomed track','green'],['Flat & packed','teal'],['Perfect intro','blue']],
+      note:'Dedicated groomed fat bike loop on packed corduroy — the ideal surface for learning. Flat enough to focus on handling. Shared with snowshoers, keep right.' },
+    { name:'River Trail (Winter)', dist:'5.8 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Mostly flat','green'],['Packed snow','teal'],['Some soft sections','orange']],
+      note:'River valley flat with occasional soft spots where wind drifts the snow. Great for building confidence on varied snow without any technical terrain.' },
+  ];
+  if(spec==='fatbike') return [
+    { name:'Singletrack Snow Loop', dist:'8.3 mi', elev:'800 ft', time:'~2 hrs',
+      bg:['#90CAF9','#1565C0'],
+      badges:[['Packed singletrack','teal'],['Riding fast right now','green'],['Some technical roots','orange']],
+      note:'Best fat bike singletrack in the area right now. Packed base with 3" of fresh on top — perfect. Roots at mile 4 are slippery when cold, warm up before you push it.' },
+    { name:'Ridge Fat Bike Route', dist:'11.2 mi', elev:'1,600 ft', time:'~2.5 hrs',
+      bg:['#64B5F6','#1976D2'],
+      badges:[['Epic views','purple'],['Sustained climb','orange'],['Wind exposure on ridge','red']],
+      note:'Big climb, big reward. The ridge is exposed and wind can firm up the snow to boilerplate — check conditions before committing to the top. Worth it when it\'s good.' },
+  ];
+
+  // ── Backcountry ski ──
+  if(spec==='backcountry'&&(exp==='first'||exp==='few')) return [
+    { name:'Lower Treed Slopes', dist:'3.2 mi', elev:'800 ft', time:'~3 hrs',
+      bg:['#BBDEFB','#64B5F6'],
+      badges:[['Below treeline','green'],['Low avalanche exposure','teal'],['Good for learning skinning','blue']],
+      note:'Tree-protected slopes well below avalanche terrain. Good place to learn skinning and transitions without exposure concerns. Check the forecast anyway — always.' },
+    { name:'Groomed Uptrack to Ridge', dist:'4.8 mi', elev:'1,200 ft', time:'~3.5 hrs',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Established uptrack','green'],['Moderate terrain','blue'],['Used by many skiers','teal']],
+      note:'Well-traveled skintrack with low consequence terrain. The descent stays in the trees until you\'re comfortable committing to the open face. Good intro to the bigger mountains.' },
+  ];
+  if(spec==='backcountry') return [
+    { name:'North Face Couloir', dist:'6.1 mi', elev:'2,800 ft', time:'~5 hrs',
+      bg:['#42A5F5','#1565C0'],
+      badges:[['Avalanche terrain','red'],['Aspect: N','gray'],['Wind slab risk today','orange']],
+      note:'Classic north-facing line, loaded by recent winds. Wind slab concern on upper third — test before committing. Skin in, ski out in 2 shots. Epic when it\'s safe.' },
+    { name:'South Bowl Traverse', dist:'9.4 mi', elev:'3,200 ft', time:'~6 hrs',
+      bg:['#90CAF9','#1976D2'],
+      badges:[['Mellow aspect','green'],['Long day','purple'],['Good snow stability today','teal']],
+      note:'South-facing bowl with better stability today per the forecast. Long approach but the descent is 2,000ft of open skiing. Parking at the lower lot, 5:30am to beat the skin track crowd.' },
+    { name:'Ridgeline Ski Tour', dist:'7.8 mi', elev:'2,400 ft', time:'~5 hrs',
+      bg:['#BBDEFB','#1E88E5'],
+      badges:[['Mixed aspects','orange'],['Corniced ridge','red'],['Outstanding views','purple']],
+      note:'Ridgeline tour with several aspect changes. Cornices on the east side — stay back from the edge on the approach. Descent off the west face is in great shape right now.' },
   ];
 
   // ── Default ──
