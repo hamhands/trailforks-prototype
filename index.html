@@ -190,6 +190,79 @@
     cursor: pointer; font-family: inherit;
   }
   .restart:active { background: var(--green-bg); }
+
+  /* ── See on map CTA ── */
+  .map-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--green); color: #fff;
+    padding: 16px 20px; border-radius: var(--radius);
+    cursor: pointer; border: none; width: 100%;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .map-cta:active { background: var(--green-light); }
+  .map-cta-sub { font-size: 13px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
+  .map-cta-arrow { font-size: 22px; }
+
+  /* ── Full map screen ── */
+  .map-screen-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px 10px; background: #fff;
+    border-bottom: 1px solid #E5E7EB; flex-shrink: 0;
+  }
+  .map-back-btn {
+    border: none; background: none; font-size: 15px; font-weight: 600;
+    color: var(--green); cursor: pointer; padding: 4px 0; font-family: inherit;
+  }
+  .map-screen-title { font-size: 17px; font-weight: 700; }
+  .map-full {
+    flex: 0 0 52%; background: linear-gradient(160deg, #E8F5E9 0%, #C8E6C9 50%, #B2DFDB 100%);
+    position: relative; overflow: hidden;
+  }
+  .map-full.snow { background: linear-gradient(160deg, #E3F2FD 0%, #BBDEFB 50%, #B2EBF2 100%); }
+  .map-pin {
+    position: absolute; transform: translate(-50%, -100%);
+    display: flex; flex-direction: column; align-items: center; cursor: pointer;
+  }
+  .map-pin-bubble {
+    width: 28px; height: 28px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg); display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 12px; color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .map-pin-bubble span { transform: rotate(45deg); display: block; }
+  .map-pin-label {
+    background: rgba(255,255,255,0.92); font-size: 11px; font-weight: 600;
+    padding: 3px 7px; border-radius: 6px; margin-top: 2px; white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12); max-width: 110px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .map-tray {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 12px 16px 40px; display: flex; flex-direction: column; gap: 10px;
+    background: var(--light);
+  }
+  .tray-card {
+    background: #fff; border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .tray-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff;
+  }
+  .tray-info { flex: 1; min-width: 0; }
+  .tray-name { font-size: 15px; font-weight: 700; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tray-meta { font-size: 12px; color: var(--gray); }
+  .dir-btn {
+    flex-shrink: 0; padding: 8px 14px; border-radius: 10px;
+    background: var(--green); color: #fff; border: none;
+    font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+  }
+  .dir-btn:active { background: var(--green-light); }
 </style>
 </head>
 <body>
@@ -200,7 +273,7 @@
     <button class="back-btn hidden">&larr;</button>
     <div class="progress">
       <div class="progress-dot current"></div><div class="progress-dot"></div>
-      <div class="progress-dot"></div><div class="progress-dot"></div>
+      <div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div>
     </div>
   </div>
   <div class="q-area">
@@ -223,7 +296,7 @@
     <button class="back-btn" onclick="goBack()">&larr;</button>
     <div class="progress">
       <div class="progress-dot filled"></div><div class="progress-dot current"></div>
-      <div class="progress-dot"></div><div class="progress-dot"></div>
+      <div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div>
     </div>
   </div>
   <div class="q-area">
@@ -240,7 +313,7 @@
     <button class="back-btn" onclick="goBack()">&larr;</button>
     <div class="progress">
       <div class="progress-dot filled"></div><div class="progress-dot filled"></div>
-      <div class="progress-dot current"></div><div class="progress-dot"></div>
+      <div class="progress-dot current"></div><div class="progress-dot"></div><div class="progress-dot"></div>
     </div>
   </div>
   <div class="q-area">
@@ -262,7 +335,7 @@
     <button class="back-btn" onclick="goBack()">&larr;</button>
     <div class="progress">
       <div class="progress-dot filled"></div><div class="progress-dot filled"></div>
-      <div class="progress-dot filled"></div><div class="progress-dot current"></div>
+      <div class="progress-dot filled"></div><div class="progress-dot current"></div><div class="progress-dot"></div>
     </div>
   </div>
   <div class="q-area">
@@ -278,8 +351,30 @@
   </div>
 </div>
 
-<!-- ═══ S5: Results ═══ -->
+<!-- ═══ S5: Getting there ═══ -->
 <div class="screen" id="s5">
+  <div class="topbar">
+    <button class="back-btn" onclick="goBack()">&larr;</button>
+    <div class="progress">
+      <div class="progress-dot filled"></div><div class="progress-dot filled"></div>
+      <div class="progress-dot filled"></div><div class="progress-dot filled"></div><div class="progress-dot current"></div>
+    </div>
+  </div>
+  <div class="q-area">
+    <div class="q-label">Getting there</div>
+    <div class="q-text">How are you getting to the trailhead?</div>
+    <div class="q-sub">We'll set up directions in the right mode for you.</div>
+  </div>
+  <div class="opts-grid" id="o5">
+    <div class="g-card" data-v="drive"><div class="g-icon">🚗</div><div class="g-label">Driving</div><div class="g-sub">I'll park at the trailhead</div></div>
+    <div class="g-card" data-v="bike"><div class="g-icon">🚲</div><div class="g-label">Biking there</div><div class="g-sub">Riding to the start</div></div>
+    <div class="g-card" data-v="transit"><div class="g-icon">🚌</div><div class="g-label">Transit / walk</div><div class="g-sub">No car</div></div>
+    <div class="g-card" data-v="here"><div class="g-icon">📍</div><div class="g-label">Already there</div><div class="g-sub">I'm at the trailhead</div></div>
+  </div>
+</div>
+
+<!-- ═══ S6: Results ═══ -->
+<div class="screen" id="s6">
   <div class="res-header">
     <div class="tag" id="r-tag"></div>
     <h1 id="r-title"></h1>
@@ -288,11 +383,23 @@
   <div class="res-body" id="r-body"></div>
 </div>
 
+<!-- ═══ S7: Map ═══ -->
+<div class="screen" id="s7">
+  <div class="map-screen-header">
+    <button class="map-back-btn" onclick="goBack()">&larr; Back</button>
+    <div class="map-screen-title">Your trails</div>
+  </div>
+  <div class="map-full" id="map-full">
+    <svg id="map-svg" viewBox="0 0 400 280" fill="none" style="width:100%;height:100%"></svg>
+  </div>
+  <div class="map-tray" id="map-tray"></div>
+</div>
+
 <script>
-const S = { act: null, spec: null, exp: null, vibe: null };
+const S = { act: null, spec: null, exp: null, vibe: null, transport: null };
 let hist = [];
 let cur = 0;
-const ids = ['s1','s2','s3','s4','s5'];
+const ids = ['s1','s2','s3','s4','s5','s6','s7'];
 
 // ── Specifics config ──
 const specCfg = {
@@ -397,7 +504,7 @@ function goBack(){
   cur=p;
 }
 function restart(){
-  S.act=S.spec=S.exp=S.vibe=null; hist=[]; cur=0;
+  S.act=S.spec=S.exp=S.vibe=S.transport=null; hist=[]; cur=0;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active','exit'));
   document.querySelectorAll('.opt,.g-card').forEach(c=>c.classList.remove('sel'));
   document.getElementById('s1').classList.add('active');
@@ -415,7 +522,8 @@ function wire(id,key,next){
 
 wire('o1','act',()=>{ buildS2(); goTo(1); });
 wire('o3','exp',()=>{ goTo(3); });
-wire('o4','vibe',()=>{ buildResults(); setTimeout(()=>goTo(4),100); });
+wire('o4','vibe',()=>{ goTo(4); });
+wire('o5','transport',()=>{ buildResults(); setTimeout(()=>goTo(5),100); });
 
 function buildS2(){
   const cfg=specCfg[S.act];
@@ -468,14 +576,13 @@ function buildResults(){
     body.innerHTML+=`<div class="icard ${c.cls}"><div class="icard-head"><div class="icard-ico">${c.ico}</div><div class="icard-title">${c.t}</div></div><p>${c.p}</p></div>`;
   });
 
-  // Map
-  const snowClass = act==='snow' ? ' snow' : '';
-  body.innerHTML+=`
-    <div class="section-title">Your map</div>
-    <div class="map-box${snowClass}">
-      <svg viewBox="0 0 400 130" fill="none">${mapSVG()}</svg>
-      <div class="map-label">Filtered for ${specName[spec]}</div>
-    </div>`;
+  // Map CTA
+  const transportLabel={drive:'Driving directions',bike:'Cycling directions',transit:'Transit directions',here:'Already there'};
+  const ctaSub = S.transport==='here' ? 'Tap any trail to see where it is' : `${transportLabel[S.transport]} to each trailhead`;
+  body.innerHTML+=`<button class="map-cta" onclick="buildMap();goTo(6)">
+    <div><div>See on map</div><div class="map-cta-sub">${ctaSub}</div></div>
+    <div class="map-cta-arrow">→</div>
+  </button>`;
 
   // Trails
   body.innerHTML+=`<div class="section-title">Recommended for you</div>`;
@@ -994,6 +1101,163 @@ function getTrails(){
       badges:[['Nice loop','blue'],['Some climbing','blue']],
       note:'Good loop with moderate climbing. Well-maintained trail through pines.' },
   ];
+}
+
+// ── Trailhead coordinates (lat, lng) ──
+// Using real area coordinates near Bend, OR / Sisters, OR
+const trailheads = {
+  'Old Mill Fire Road Loop':      [44.056, -121.319],
+  'Valley Connector':             [44.102, -121.408],
+  'Ridge Road to Overlook':       [44.167, -121.512],
+  'Ridgeline Traverse':           [44.211, -121.553],
+  'Canyon Loop':                  [44.089, -121.477],
+  'Backroads Century Route':      [44.301, -121.601],
+  'Green Flow':                   [44.048, -121.338],
+  'Meadow Cruise':                [44.061, -121.322],
+  'Rollercoaster Jr.':            [44.053, -121.333],
+  'Chainbreaker':                 [44.075, -121.492],
+  "Devil's Spine":                [44.083, -121.501],
+  'Ridgeline Express':            [44.091, -121.514],
+  'Meadow Loop':                  [44.058, -121.298],
+  'Discovery Trail':              [44.062, -121.305],
+  'Creekside Walk':               [44.049, -121.311],
+  'Pine Loop':                    [44.134, -121.388],
+  'Riverside Trail':              [44.127, -121.373],
+  'Ridgetop Out & Back':          [44.145, -121.402],
+  'Eagle Peak Trail':             [44.192, -121.533],
+  'North Ridge Loop':             [44.208, -121.548],
+  'Canyon Traverse':              [44.179, -121.522],
+  'Lakeside Stroll':              [44.041, -121.356],
+  'Wildflower Meadow':            [44.035, -121.342],
+  'Old Growth Trail':             [44.029, -121.368],
+  'Ridgeline Traverse':           [44.211, -121.553],
+  'Valley to Peak Loop':          [44.198, -121.541],
+  'Creek Corridor':               [44.223, -121.578],
+  'Ridge Climb Repeats':          [44.157, -121.488],
+  'Tempo Loop':                   [44.062, -121.315],
+  'Hill Sprint Path':             [44.068, -121.321],
+  'Riverside Path':               [44.055, -121.302],
+  'Park Loop':                    [44.051, -121.295],
+  'Orchard Trail':                [44.044, -121.288],
+  'Overlook Point Trail':         [44.171, -121.519],
+  'Waterfall Walk':               [44.163, -121.507],
+  'Sunset Ridge':                 [44.155, -121.495],
+  'Sunset Ridge Trail':           [44.155, -121.495],
+  'Creekside Path':               [44.049, -121.311],
+  // Moto / ATV
+  'Beginner OHV Loop':            [44.242, -121.621],
+  'Pine Flat Fire Road':          [44.251, -121.638],
+  'Valley OHV Access Route':      [44.263, -121.655],
+  'Ridgeback Enduro Loop':        [44.278, -121.671],
+  'South Fork Trail':             [44.289, -121.684],
+  'East Mesa Connector':          [44.312, -121.702],
+  'Mesa Verde OHV Route':         [44.325, -121.718],
+  'Dry Creek Basin Loop':         [44.338, -121.733],
+  'Pinyon Ridge Connector':       [44.314, -121.709],
+  // Snow
+  'Lower Meadow Loop':            [44.388, -121.801],
+  'Forest Walk Trail':            [44.397, -121.815],
+  'Lakeview Out & Back':          [44.405, -121.829],
+  'Ridgeline Snowshoe Route':     [44.422, -121.848],
+  'Backcountry Creek Route':      [44.441, -121.863],
+  'Summit Connector':             [44.434, -121.855],
+  'Groomed Beginner Loop':        [44.358, -121.774],
+  'Valley Nordic Trail':          [44.365, -121.787],
+  'Ridgeline XC Route':           [44.379, -121.795],
+  'Backcountry Nordic Circuit':   [44.412, -121.834],
+  'Groomed Fat Bike Loop':        [44.352, -121.768],
+  'River Trail (Winter)':         [44.344, -121.759],
+  'Singletrack Snow Loop':        [44.371, -121.792],
+  'Ridge Fat Bike Route':         [44.385, -121.808],
+  'Lower Treed Slopes':           [44.451, -121.877],
+  'Groomed Uptrack to Ridge':     [44.461, -121.889],
+  'North Face Couloir':           [44.478, -121.904],
+  'South Bowl Traverse':          [44.489, -121.918],
+  'Ridgeline Ski Tour':           [44.472, -121.910],
+};
+
+function getDirectionsUrl(trailName){
+  const coords = trailheads[trailName];
+  if(!coords) return '#';
+  const [lat,lng] = coords;
+  const modeMap = { drive:'driving', bike:'bicycling', transit:'transit', here:'walking' };
+  const mode = modeMap[S.transport] || 'driving';
+  // Detect iOS for Apple Maps handoff
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+  if(isIOS){
+    const appleModeMap = { drive:'d', bike:'b', transit:'r', here:'w' };
+    return `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=${appleModeMap[S.transport]||'d'}`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`;
+}
+
+// ── Pin colors per trail number ──
+const pinColors = ['#2D6A4F','#E76F51','#2A9D8F'];
+
+function buildMap(){
+  const trails = getTrails();
+  const act = S.act;
+
+  // Map background
+  const mapEl = document.getElementById('map-full');
+  if(act==='snow') mapEl.classList.add('snow');
+  else mapEl.classList.remove('snow');
+
+  // Build SVG with schematic terrain + numbered pins
+  const svg = document.getElementById('map-svg');
+  const g='#22C55E', o='#F97316', s='#90CAF9', gry='#D1D5DB';
+
+  // Terrain paths (simplified schematic)
+  let terrain = '';
+  if(act==='snow'){
+    terrain=`<path d="M0 200Q80 170 160 150Q240 130 320 120Q370 112 400 105" stroke="${s}" stroke-width="1.5" fill="none" opacity="0.5"/>
+      <path d="M0 240Q100 220 200 205Q300 190 400 175" stroke="${s}" stroke-width="1.5" fill="none" opacity="0.4"/>`;
+  } else {
+    terrain=`<path d="M0 220Q80 195 160 180Q240 165 320 148Q370 138 400 128" stroke="${g}" stroke-width="1.5" fill="none" opacity="0.45"/>
+      <path d="M0 255Q100 240 200 228Q300 216 400 200" stroke="${g}" stroke-width="1.5" fill="none" opacity="0.35"/>`;
+  }
+
+  // Spread pins across the map area
+  const pinPositions = [
+    {x:'28%', y:'52%'}, {x:'55%', y:'36%'}, {x:'76%', y:'58%'}
+  ];
+
+  let pinsHTML = '';
+  trails.slice(0,3).forEach((t,i)=>{
+    const pos = pinPositions[i];
+    const col = pinColors[i];
+    pinsHTML += `<circle cx="${pos.x}" cy="${pos.y}" r="14" fill="${col}" opacity="0.15"/>
+      <circle cx="${pos.x}" cy="${pos.y}" r="9" fill="${col}" stroke="#fff" stroke-width="2"/>
+      <text x="${pos.x}" y="${pos.y}" dominant-baseline="central" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">${i+1}</text>`;
+  });
+
+  svg.innerHTML = terrain + pinsHTML;
+
+  // Build tray cards
+  const tray = document.getElementById('map-tray');
+  tray.innerHTML = '';
+  const showDirections = S.transport !== 'here';
+
+  trails.slice(0,3).forEach((t,i)=>{
+    const col = pinColors[i];
+    const dirUrl = getDirectionsUrl(t.name);
+    const dirBtn = showDirections
+      ? `<a href="${dirUrl}" target="_blank" rel="noopener"><button class="dir-btn">Go →</button></a>`
+      : '';
+    tray.innerHTML += `
+      <div class="tray-card">
+        <div class="tray-num" style="background:${col}">${i+1}</div>
+        <div class="tray-info">
+          <div class="tray-name">${t.name}</div>
+          <div class="tray-meta">📏 ${t.dist} · ⬆️ ${t.elev} · ⏱️ ${t.time}</div>
+        </div>
+        ${dirBtn}
+      </div>`;
+  });
+
+  if(!showDirections){
+    tray.innerHTML += `<p style="font-size:13px;color:var(--gray);text-align:center;padding:4px 0 8px">You're already there — pick a trail and head out!</p>`;
+  }
 }
 </script>
 </body>
