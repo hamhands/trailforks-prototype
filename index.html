@@ -598,6 +598,457 @@ function getCards(){
   }
   return cards;
 }
+
+function getTrails(){
+  const {act,spec,exp,vibe}=S;
+
+  // ── Gravel first-timer / beginner ──
+  if(spec==='gravel'&&(exp==='first'||exp==='few')) return [
+    { name:'Old Mill Fire Road Loop', dist:'12.3 mi', elev:'640 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Beginner friendly','green'],['Packed surface','teal'],['Easy loop','blue']],
+      note:'Smooth packed gravel the whole way. Wide enough to ride side-by-side. Good first gravel ride — nothing surprising.' },
+    { name:'Valley Connector', dist:'8.1 mi', elev:'320 ft', time:'~1 hr',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Beginner friendly','green'],['Easy out & back','blue']],
+      note:'Flat river valley route. The gravel is loose in a few spots but nothing your tires can\'t handle. Turn around whenever you want.' },
+    { name:'Ridge Road to Overlook', dist:'15.7 mi', elev:'1,100 ft', time:'~2 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Worth it for the views','purple'],['Descent can be tricky','orange'],['Might need to dry out','red']],
+      note:'Great ride but the descent at mile 11 is steep loose gravel for about half a mile. Walk it if you\'re not comfortable — no shame, most people do their first time. Recent reports mention mud on the north-facing section around mile 6 — should clear up in a day or two.' },
+  ];
+
+  // ── Gravel seasoned ──
+  if(spec==='gravel'&&exp==='seasoned') return [
+    { name:'Ridgeline Traverse', dist:'42 mi', elev:'3,800 ft', time:'~4 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['All-day epic','purple'],['Technical sections','orange'],['Remote — bring supplies','red']],
+      note:'Proper gravel epic. Mixed surface, some hike-a-bike on the ridge. Water at mile 16 and 28.' },
+    { name:'Canyon Loop', dist:'28 mi', elev:'2,200 ft', time:'~3 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Fast & flowy','teal'],['Steep loose descent','orange']],
+      note:'Riding fast right now — recent grading on the main climb. Descent into the canyon is chunky.' },
+    { name:'Backroads Century Route', dist:'64 mi', elev:'4,600 ft', time:'~6 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Big day','purple'],['Mostly smooth','green'],['Resupply at mi 30','blue']],
+      note:'Links rural backroads through three valleys. Store at the halfway point. Avoid in headwind season.' },
+  ];
+
+  // ── MTB first-timer ──
+  if(spec==='mtb'&&exp==='first') return [
+    { name:'Green Flow', dist:'3.2 mi', elev:'280 ft', time:'~30 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Beginner friendly','green'],['Machine-built flow','teal'],['One-way','gray']],
+      note:'Bermed corners, gentle rolls, wide sightlines. The perfect intro to singletrack. You\'ll want to lap it.' },
+    { name:'Meadow Cruise', dist:'4.8 mi', elev:'190 ft', time:'~45 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Wide & forgiving','green'],['Easy out & back','blue']],
+      note:'Fire road width the whole way. Lets you get used to your bike off-road without any technical surprises.' },
+    { name:'Rollercoaster Jr.', dist:'2.1 mi', elev:'340 ft', time:'~25 min',
+      bg:['#C9B1FF','#7B68EE'],
+      badges:[['Fun rollers','purple'],['Slightly more technical','blue'],['One-way','gray'],['Might need to dry out','red']],
+      note:'Step up from Green Flow — tighter corners, small tabletop jumps (all rollable). Try this after a few laps of the green. A few recent reports mention slick roots on the north side — give it a day if it rained.' },
+  ];
+
+  // ── MTB expert ──
+  if(spec==='mtb'&&exp==='seasoned') return [
+    { name:'Chainbreaker', dist:'5.4 mi', elev:'1,800 ft', time:'~1 hr',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Just rehabbed','teal'],['Technical rock','red'],['Steep exposure','orange']],
+      note:'New rock armoring on the crux — rides way better now. Mandatory line through the rock garden at mile 3. Exposure on the ridge is real.' },
+    { name:"Devil's Spine", dist:'3.8 mi', elev:'1,200 ft', time:'~45 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Riding fast right now','teal'],['Steep & loose','red']],
+      note:'Tacky conditions this week. Upper section is wide open, lower gets tight and rooty. Mandatory drop at the bottom — 4ft, steep landing.' },
+    { name:'Ridgeline Express', dist:'7.2 mi', elev:'2,100 ft', time:'~1.5 hrs',
+      bg:['#6B7280','#374151'],
+      badges:[['Partially closed','red'],['Open to mile 3','gray']],
+      note:'Closed past mile 3 for erosion control. First 3 miles are worth it though — sustained tech climbing with big views. Check back next month for the full trail.' },
+  ];
+
+  // ── Family hike ──
+  if(spec==='family') return [
+    { name:'Meadow Loop', dist:'1.4 mi', elev:'60 ft', time:'~40 min with kids',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Stroller friendly','green'],['Picnic area','blue'],['Restrooms','teal']],
+      note:'Flat, wide, crushed gravel. Picnic tables and a covered shelter at the halfway point. Wildflowers in spring.' },
+    { name:'Discovery Trail', dist:'2.1 mi', elev:'120 ft', time:'~1 hr with kids',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Nature signs for kids','purple'],['Mostly flat','green'],['Easy loop','blue']],
+      note:'Interpretive signs about local plants and animals — kids love the scavenger hunt checklist at the trailhead. One gentle hill.' },
+    { name:'Creekside Walk', dist:'1.8 mi', elev:'80 ft', time:'~45 min',
+      bg:['#C9B1FF','#7B68EE'],
+      badges:[['Water play spot','blue'],['Shaded','teal'],['Easy out & back','green']],
+      note:'Kids can wade at the midpoint where the creek gets shallow and sandy. Entire trail is shaded. Turn back whenever they\'re done.' },
+  ];
+
+  // ── Dog hike ──
+  if(spec==='dog') return [
+    { name:'Pine Loop', dist:'3.2 mi', elev:'320 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Off-leash allowed','green'],['Creek access','blue'],['Easy loop','teal'],['Muddy spots reported','orange']],
+      note:'Off-leash the whole way. Creek crossing at mile 1.5 can run deep after rain — check the trailhead board. Mostly shaded. Recent reports: muddy near the creek crossing, rest of the loop is fine.' },
+    { name:'Riverside Trail', dist:'4.1 mi', elev:'140 ft', time:'~1.5 hrs',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Leash required','orange'],['Flat & wide','green'],['Water access','blue']],
+      note:'Leash required but lots of water access points for your dog. Paved first mile, then packed dirt. Very popular on weekends.' },
+    { name:'Ridgetop Out & Back', dist:'5.6 mi', elev:'900 ft', time:'~2.5 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Off-leash allowed','green'],['Steep in places','orange'],['No water on trail','red']],
+      note:'Great workout for athletic dogs. No water sources — bring extra for your pup. Exposed ridge can be hot in summer.' },
+  ];
+
+  // ── Hike challenge ──
+  if(act==='hike'&&vibe==='challenge') return [
+    { name:'Eagle Peak Trail', dist:'6.4 mi', elev:'1,900 ft', time:'~3.5 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Summit views','purple'],['Sustained climb','orange'],['Well-marked','green']],
+      note:'Steady uphill the whole way — it\'s honest work but the 360° views from the top make it worth every step. Trail is clear and well-cairned.' },
+    { name:'North Ridge Loop', dist:'8.2 mi', elev:'2,400 ft', time:'~5 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Real climb','red'],['Scramble section','orange'],['Not for beginners','gray']],
+      note:'The ridge scramble at mile 5 requires hands — nothing exposed, but you need to be comfortable with it. Rest of the trail is solid hiking.' },
+    { name:'Canyon Traverse', dist:'5.1 mi', elev:'1,100 ft', time:'~3 hrs',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Creek crossings','blue'],['Shaded canyon','teal'],['Moderate challenge','blue'],['Muddy after rain','orange']],
+      note:'Three creek crossings (ankle to knee deep depending on season). The canyon section is gorgeous and cool even in summer. Good intro to harder terrain. Canyon floor stays wet longer than ridgeline trails — expect some mud if it rained in the last 48 hrs.' },
+  ];
+
+  // ── Hike chill ──
+  if(act==='hike'&&vibe==='chill') return [
+    { name:'Lakeside Stroll', dist:'2.4 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Almost flat','green'],['Lake views','blue'],['Benches along the way','teal']],
+      note:'Gentle path around the lake. Benches every quarter mile. The east side has the best morning light for photos.' },
+    { name:'Wildflower Meadow', dist:'1.8 mi', elev:'120 ft', time:'~45 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy loop','green'],['Scenic','purple'],['Stroller OK in dry conditions','teal']],
+      note:'Peak wildflowers in June/July. Gentle rolling terrain through open meadow. There\'s a bench at the top of the small hill with valley views.' },
+    { name:'Old Growth Trail', dist:'3.1 mi', elev:'200 ft', time:'~1.5 hrs',
+      bg:['#52B788','#2D6A4F'],
+      badges:[['Shaded & cool','teal'],['Peaceful','green'],['Easy out & back','blue']],
+      note:'Walk among old growth conifers. Very little elevation, soft trail surface. One of the quieter trails — rarely crowded even on weekends.' },
+  ];
+
+  // ── Ultra ──
+  if(spec==='ultra') return [
+    { name:'Ridgeline Traverse', dist:'26.4 mi', elev:'5,200 ft', time:'~6-8 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['3 water sources','blue'],['Road bailout at mi 7 & 14','orange'],['Exposed ridge — check weather','red']],
+      note:'The big one. Water at miles 4, 11, 18. Emergency road access at miles 7 and 14. Exposed above treeline for miles 8-15 — bail early if weather turns.' },
+    { name:'Valley to Peak Loop', dist:'18.7 mi', elev:'3,800 ft', time:'~4-6 hrs',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Mostly runnable','green'],['One big climb','orange'],['Well-marked','teal']],
+      note:'Fast valley running for first 7 miles, then a 2,400ft climb to the peak, fast descent home. The climb is relentless but never technical.' },
+    { name:'Creek Corridor', dist:'31.2 mi', elev:'4,100 ft', time:'~7-9 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Gentle grade','green'],['Many water crossings','blue'],['Rarely marked — nav skills needed','orange'],['Trail might need to dry out','red']],
+      note:'Follows the creek drainage for 31 miles. Gentle grade but the crossings add up — expect wet feet all day. Trail markings fade past mile 20, bring a GPS track. Multiple reports from this week say the lower section is boggy — consider waiting a few days.' },
+  ];
+
+  // ── Run workout ──
+  if(act==='run'&&vibe==='workout') return [
+    { name:'Ridge Climb Repeats', dist:'4.2 mi', elev:'1,400 ft', time:'~45 min',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Strava segment','purple'],['Sustained steep','red'],['PR: 4:32','gray']],
+      note:'847 attempts on the main Strava segment. Steep the whole way, good footing. Most people do 2-3 laps. The record was set in October — prime conditions.' },
+    { name:'Tempo Loop', dist:'6.8 mi', elev:'480 ft', time:'~50 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Fast & runnable','green'],['Rolling terrain','blue'],['Popular loop','teal']],
+      note:'The go-to tempo loop for locals. Smooth trail, gentle rolls, enough elevation to keep you honest. Run it clockwise for the better descent finish.' },
+    { name:'Hill Sprint Path', dist:'2.4 mi', elev:'600 ft', time:'~25 min',
+      bg:['#C1121F','#780000'],
+      badges:[['Quad burner','red'],['Short & steep','orange'],['Great for intervals','purple']],
+      note:'Half a mile up, half a mile down, repeat. The grade is 15-20% the whole way. Locals use it for hill repeat workouts — 4 laps is a solid session.' },
+  ];
+
+  // ── Run casual ──
+  if(act==='run'&&spec==='casual') return [
+    { name:'Riverside Path', dist:'3.4 mi', elev:'60 ft', time:'~30 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Flat & smooth','green'],['Scenic','purple'],['Easy out & back','blue']],
+      note:'Paved path along the river. Flat, shaded, beautiful. Turn around whenever you want — it\'s an out and back.' },
+    { name:'Park Loop', dist:'2.2 mi', elev:'90 ft', time:'~20 min',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy loop','green'],['Restrooms','teal'],['Well-lit','blue']],
+      note:'Gentle loop through the park. Crushed gravel, flat, restrooms at the start. Fine for early morning or evening runs — partly lit.' },
+    { name:'Orchard Trail', dist:'4.1 mi', elev:'180 ft', time:'~40 min',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['Gentle hills','blue'],['Shaded','teal'],['Soft surface','green']],
+      note:'Winds through old orchard land. Soft dirt trail, gentle rollers. The shade makes it great for warm days. A little longer but never hard.' },
+  ];
+
+  // ── Walk scenic ──
+  if(act==='walk'&&spec==='scenic') return [
+    { name:'Overlook Point Trail', dist:'1.6 mi', elev:'240 ft', time:'~45 min',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Best viewpoint nearby','purple'],['Short climb','blue'],['Bench at the top','teal']],
+      note:'Quick walk up to a panoramic viewpoint. The climb is short and the bench at the top lets you take it all in. Best light in the morning.' },
+    { name:'Waterfall Walk', dist:'2.3 mi', elev:'180 ft', time:'~1 hr',
+      bg:['#2A9D8F','#264653'],
+      badges:[['Waterfall at the end','purple'],['Easy out & back','green'],['Shaded','teal']],
+      note:'Nice payoff hike — easy walk through forest to a 40ft waterfall. Best flow in spring but pretty year-round. Gets busy on weekends.' },
+    { name:'Sunset Ridge', dist:'1.9 mi', elev:'300 ft', time:'~50 min',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Best sunset spot','purple'],['Short climb','blue'],['Wide trail','green']],
+      note:'The locals\' sunset spot. West-facing ridge with unobstructed views. The walk up is easy and the trail is wide enough for groups.' },
+  ];
+
+  // ── Moto ──
+  if(spec==='moto'&&exp==='first') return [
+    { name:'Beginner OHV Loop', dist:'6 mi', elev:'400 ft', time:'~1 hr',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Wide & forgiving','green'],['No technical sections','teal'],['Well-signed','blue']],
+      note:'Broad dirt track with good sightlines. Nothing technical — great place to build confidence. Speed limits posted, respect them.' },
+    { name:'Pine Flat Fire Road', dist:'4.2 mi', elev:'180 ft', time:'~40 min',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Easy out & back','green'],['Hardpack','teal']],
+      note:'Smooth hardpack fire road, almost no surprises. Good place to practice slow-speed control and get comfortable with your bike.' },
+    { name:'Valley OHV Access Route', dist:'8.1 mi', elev:'520 ft', time:'~1.5 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['One technical corner','orange'],['Mostly easy','green'],['Connects to main system','blue']],
+      note:'Mostly easy with one slightly off-camber corner around mile 5. Take it slow the first time. Links you into the full OHV network if you want to explore further.' },
+  ];
+  if(spec==='moto') return [
+    { name:'Ridgeback Enduro Loop', dist:'18 mi', elev:'2,400 ft', time:'~2.5 hrs',
+      bg:['#E76F51','#C1121F'],
+      badges:[['Singletrack','red'],['Technical rock sections','orange'],['Riding well right now','teal']],
+      note:'Classic local enduro loop. Rock gardens at miles 6 and 13 — both rideable but deserve respect. Tacky conditions on the upper section this week.' },
+    { name:'South Fork Trail', dist:'11 mi', elev:'1,200 ft', time:'~1.5 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Fast & flowy','teal'],['Some loose corners','orange'],['Popular loop','blue']],
+      note:'Fast, flowy singletrack with a few loose downhill corners. The best part of the local system for most riders. Starts easy, gets more interesting.' },
+    { name:'East Mesa Connector', dist:'24 mi', elev:'3,100 ft', time:'~3 hrs',
+      bg:['#457B9D','#1D3557'],
+      badges:[['Full day option','purple'],['Mixed terrain','blue'],['Remote — fuel up','orange']],
+      note:'Links three trail systems over the mesa. Half dirt road, half singletrack. No services out there — bring extra fuel and water.' },
+  ];
+
+  // ── ATV ──
+  if(spec==='atv') return [
+    { name:'Mesa Verde OHV Route', dist:'14 mi', elev:'800 ft', time:'~2 hrs',
+      bg:['#DDA15E','#BC6C25'],
+      badges:[['ATV & side-by-side friendly','green'],['Wide trail','teal'],['Scenic overlook at mi 7','purple']],
+      note:'Well-maintained ATV route with great views at the halfway point. Hardpack with some loose sections on the descents. Suitable for most side-by-sides.' },
+    { name:'Dry Creek Basin Loop', dist:'22 mi', elev:'1,400 ft', time:'~3 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Loop route','blue'],['Rocky in spots','orange'],['Water crossing','teal']],
+      note:'Big loop through high desert. Rocky patches on the north side — manageable, just slow down. Shallow water crossing at mile 16, usually a foot deep or less.' },
+    { name:'Pinyon Ridge Connector', dist:'9 mi', elev:'600 ft', time:'~1.5 hrs',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Shorter option','green'],['Good surface','teal'],['Links to Mesa Verde','blue']],
+      note:'Good introductory route for this area. Well-graded hardpack, nothing surprising. Can link to Mesa Verde OHV Route if you want a longer day.' },
+  ];
+
+  // ── Snowshoe beginner ──
+  if(spec==='snowshoe'&&(exp==='first'||exp==='few')) return [
+    { name:'Lower Meadow Loop', dist:'2.1 mi', elev:'120 ft', time:'~1.5 hrs on snow',
+      bg:['#BBDEFB','#90CAF9'],
+      badges:[['Perfect for first-timers','green'],['Flat & open','teal'],['Well-marked','blue']],
+      note:'Wide open meadow route, impossible to get lost. Flat enough to focus on getting comfortable with the snowshoes. Groomed track you can follow if you want.' },
+    { name:'Forest Walk Trail', dist:'3.4 mi', elev:'280 ft', time:'~2 hrs',
+      bg:['#B2EBF2','#80DEEA'],
+      badges:[['Tree cover','teal'],['Gentle hills','green'],['Quiet on weekdays','blue']],
+      note:'Sheltered forest trail with a few small hills. Snowshoe tracks from other users make it easy to follow. The trees keep the snow in better shape longer.' },
+    { name:'Lakeview Out & Back', dist:'2.8 mi', elev:'160 ft', time:'~2 hrs',
+      bg:['#E3F2FD','#BBDEFB'],
+      badges:[['Lake views at the end','purple'],['Easy terrain','green'],['Turn back anytime','blue']],
+      note:'Gradual walk to a frozen lake overlook. You set the pace and turn around whenever you feel like it. The view at the end is worth it if you make it.' },
+  ];
+
+  // ── Snowshoe experienced ──
+  if(spec==='snowshoe') return [
+    { name:'Ridgeline Snowshoe Route', dist:'6.2 mi', elev:'1,400 ft', time:'~3.5 hrs',
+      bg:['#90CAF9','#42A5F5'],
+      badges:[['Open ridge','purple'],['Sustained climb','orange'],['360° views at top','teal']],
+      note:'Big climb to the ridge — steady, not technical. The views from the top are the payoff. Wind can pick up on the exposed section, bring layers.' },
+    { name:'Backcountry Creek Route', dist:'8.1 mi', elev:'900 ft', time:'~4 hrs',
+      bg:['#B2EBF2','#4DD0E1'],
+      badges:[['Untracked terrain','purple'],['Navigation needed','orange'],['Water access','blue']],
+      note:'Follows a creek drainage through untracked terrain. No marked trail — bring a GPS track or be comfortable with a map. Rewarding solitude.' },
+    { name:'Summit Connector', dist:'4.6 mi', elev:'1,100 ft', time:'~2.5 hrs',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Summit access','purple'],['Moderate climb','blue'],['Can add on to Ridge route','teal']],
+      note:'Gets you to the summit plateau on a well-traveled line. Can connect to the Ridgeline route for a bigger day if you have the legs for it.' },
+  ];
+
+  // ── Nordic / XC ski ──
+  if(spec==='xc'&&(exp==='first'||exp==='few')) return [
+    { name:'Groomed Beginner Loop', dist:'3.2 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#E3F2FD','#BBDEFB'],
+      badges:[['Track set','green'],['Flat','teal'],['Ski rental nearby','blue']],
+      note:'Track-set groomed loop on a mostly flat meadow. Perfect for learning kick and glide without worrying about hills. Rental shop at the trailhead.' },
+    { name:'Valley Nordic Trail', dist:'5.1 mi', elev:'200 ft', time:'~1.5 hrs',
+      bg:['#B2EBF2','#80DEEA'],
+      badges:[['Groomed','green'],['Gentle rollers','blue'],['Well-marked','teal']],
+      note:'Gentle terrain with a few small hills to practice your snowplow on. Well-signed intersections. The classic beginner progression from the flat loop.' },
+  ];
+  if(spec==='xc') return [
+    { name:'Ridgeline XC Route', dist:'12.4 mi', elev:'1,200 ft', time:'~3 hrs',
+      bg:['#90CAF9','#42A5F5'],
+      badges:[['Classic loop','purple'],['Some steep descents','orange'],['Groomed upper section','green']],
+      note:'The go-to XC route. Groomed on the upper half, backcountry below. The descent into the valley is the highlight — long, fast, and well-packed right now.' },
+    { name:'Backcountry Nordic Circuit', dist:'16.8 mi', elev:'2,100 ft', time:'~5 hrs',
+      bg:['#BBDEFB','#64B5F6'],
+      badges:[['Ungroomed backcountry','orange'],['Full day','purple'],['Navigation skills needed','red']],
+      note:'Ungroomed route through the backcountry. Fresh snow from two days ago is in great shape. Bring a GPS track — trail markers can be buried under heavy snow.' },
+  ];
+
+  // ── Fat bike ──
+  if(spec==='fatbike'&&(exp==='first'||exp==='few')) return [
+    { name:'Groomed Fat Bike Loop', dist:'4.1 mi', elev:'140 ft', time:'~45 min',
+      bg:['#B2EBF2','#4DD0E1'],
+      badges:[['Groomed track','green'],['Flat & packed','teal'],['Perfect intro','blue']],
+      note:'Dedicated groomed fat bike loop on packed corduroy — the ideal surface for learning. Flat enough to focus on handling. Shared with snowshoers, keep right.' },
+    { name:'River Trail (Winter)', dist:'5.8 mi', elev:'80 ft', time:'~1 hr',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Mostly flat','green'],['Packed snow','teal'],['Some soft sections','orange']],
+      note:'River valley flat with occasional soft spots where wind drifts the snow. Great for building confidence on varied snow without any technical terrain.' },
+  ];
+  if(spec==='fatbike') return [
+    { name:'Singletrack Snow Loop', dist:'8.3 mi', elev:'800 ft', time:'~2 hrs',
+      bg:['#90CAF9','#1565C0'],
+      badges:[['Packed singletrack','teal'],['Riding fast right now','green'],['Some technical roots','orange']],
+      note:'Best fat bike singletrack in the area right now. Packed base with 3" of fresh on top — perfect. Roots at mile 4 are slippery when cold, warm up before you push it.' },
+    { name:'Ridge Fat Bike Route', dist:'11.2 mi', elev:'1,600 ft', time:'~2.5 hrs',
+      bg:['#64B5F6','#1976D2'],
+      badges:[['Epic views','purple'],['Sustained climb','orange'],['Wind exposure on ridge','red']],
+      note:'Big climb, big reward. The ridge is exposed and wind can firm up the snow to boilerplate — check conditions before committing to the top. Worth it when it\'s good.' },
+  ];
+
+  // ── Backcountry ski ──
+  if(spec==='backcountry'&&(exp==='first'||exp==='few')) return [
+    { name:'Lower Treed Slopes', dist:'3.2 mi', elev:'800 ft', time:'~3 hrs',
+      bg:['#BBDEFB','#64B5F6'],
+      badges:[['Below treeline','green'],['Low avalanche exposure','teal'],['Good for learning skinning','blue']],
+      note:'Tree-protected slopes well below avalanche terrain. Good place to learn skinning and transitions without exposure concerns. Check the forecast anyway — always.' },
+    { name:'Groomed Uptrack to Ridge', dist:'4.8 mi', elev:'1,200 ft', time:'~3.5 hrs',
+      bg:['#E3F2FD','#90CAF9'],
+      badges:[['Established uptrack','green'],['Moderate terrain','blue'],['Used by many skiers','teal']],
+      note:'Well-traveled skintrack with low consequence terrain. The descent stays in the trees until you\'re comfortable committing to the open face. Good intro to the bigger mountains.' },
+  ];
+  if(spec==='backcountry') return [
+    { name:'North Face Couloir', dist:'6.1 mi', elev:'2,800 ft', time:'~5 hrs',
+      bg:['#42A5F5','#1565C0'],
+      badges:[['Avalanche terrain','red'],['Aspect: N','gray'],['Wind slab risk today','orange']],
+      note:'Classic north-facing line, loaded by recent winds. Wind slab concern on upper third — test before committing. Skin in, ski out in 2 shots. Epic when it\'s safe.' },
+    { name:'South Bowl Traverse', dist:'9.4 mi', elev:'3,200 ft', time:'~6 hrs',
+      bg:['#90CAF9','#1976D2'],
+      badges:[['Mellow aspect','green'],['Long day','purple'],['Good snow stability today','teal']],
+      note:'South-facing bowl with better stability today per the forecast. Long approach but the descent is 2,000ft of open skiing. Parking at the lower lot, 5:30am to beat the skin track crowd.' },
+    { name:'Ridgeline Ski Tour', dist:'7.8 mi', elev:'2,400 ft', time:'~5 hrs',
+      bg:['#BBDEFB','#1E88E5'],
+      badges:[['Mixed aspects','orange'],['Corniced ridge','red'],['Outstanding views','purple']],
+      note:'Ridgeline tour with several aspect changes. Cornices on the east side — stay back from the edge on the approach. Descent off the west face is in great shape right now.' },
+  ];
+
+  // ── Default ──
+  return [
+    { name:'Sunset Ridge Trail', dist:'4.6 mi', elev:'720 ft', time:'~2 hrs',
+      bg:['#F4A261','#E76F51'],
+      badges:[['Great views','purple'],['Moderate effort','blue']],
+      note:'A solid all-around trail. Enough climb to feel it, great views from the ridge, easy to follow.' },
+    { name:'Creekside Path', dist:'2.8 mi', elev:'180 ft', time:'~1 hr',
+      bg:['#95D5B2','#52B788'],
+      badges:[['Easy & shaded','green'],['Flat','teal']],
+      note:'Relaxed walk along the creek. Shaded, flat, and peaceful.' },
+    { name:'Pine Loop', dist:'5.3 mi', elev:'540 ft', time:'~2.5 hrs',
+      bg:['#A8DADC','#457B9D'],
+      badges:[['Nice loop','blue'],['Some climbing','blue']],
+      note:'Good loop with moderate climbing. Well-maintained trail through pines.' },
+  ];
+}
+
+// ── Trailhead coordinates (lat, lng) ──
+// Using real area coordinates near Bend, OR / Sisters, OR
+const trailheads = {
+  'Old Mill Fire Road Loop':      [44.056, -121.319],
+  'Valley Connector':             [44.102, -121.408],
+  'Ridge Road to Overlook':       [44.167, -121.512],
+  'Ridgeline Traverse':           [44.211, -121.553],
+  'Canyon Loop':                  [44.089, -121.477],
+  'Backroads Century Route':      [44.301, -121.601],
+  'Green Flow':                   [44.048, -121.338],
+  'Meadow Cruise':                [44.061, -121.322],
+  'Rollercoaster Jr.':            [44.053, -121.333],
+  'Chainbreaker':                 [44.075, -121.492],
+  "Devil's Spine":                [44.083, -121.501],
+  'Ridgeline Express':            [44.091, -121.514],
+  'Meadow Loop':                  [44.058, -121.298],
+  'Discovery Trail':              [44.062, -121.305],
+  'Creekside Walk':               [44.049, -121.311],
+  'Pine Loop':                    [44.134, -121.388],
+  'Riverside Trail':              [44.127, -121.373],
+  'Ridgetop Out & Back':          [44.145, -121.402],
+  'Eagle Peak Trail':             [44.192, -121.533],
+  'North Ridge Loop':             [44.208, -121.548],
+  'Canyon Traverse':              [44.179, -121.522],
+  'Lakeside Stroll':              [44.041, -121.356],
+  'Wildflower Meadow':            [44.035, -121.342],
+  'Old Growth Trail':             [44.029, -121.368],
+  'Ridgeline Traverse':           [44.211, -121.553],
+  'Valley to Peak Loop':          [44.198, -121.541],
+  'Creek Corridor':               [44.223, -121.578],
+  'Ridge Climb Repeats':          [44.157, -121.488],
+  'Tempo Loop':                   [44.062, -121.315],
+  'Hill Sprint Path':             [44.068, -121.321],
+  'Riverside Path':               [44.055, -121.302],
+  'Park Loop':                    [44.051, -121.295],
+  'Orchard Trail':                [44.044, -121.288],
+  'Overlook Point Trail':         [44.171, -121.519],
+  'Waterfall Walk':               [44.163, -121.507],
+  'Sunset Ridge':                 [44.155, -121.495],
+  'Sunset Ridge Trail':           [44.155, -121.495],
+  'Creekside Path':               [44.049, -121.311],
+  // Moto / ATV
+  'Beginner OHV Loop':            [44.242, -121.621],
+  'Pine Flat Fire Road':          [44.251, -121.638],
+  'Valley OHV Access Route':      [44.263, -121.655],
+  'Ridgeback Enduro Loop':        [44.278, -121.671],
+  'South Fork Trail':             [44.289, -121.684],
+  'East Mesa Connector':          [44.312, -121.702],
+  'Mesa Verde OHV Route':         [44.325, -121.718],
+  'Dry Creek Basin Loop':         [44.338, -121.733],
+  'Pinyon Ridge Connector':       [44.314, -121.709],
+  // Snow
+  'Lower Meadow Loop':            [44.388, -121.801],
+  'Forest Walk Trail':            [44.397, -121.815],
+  'Lakeview Out & Back':          [44.405, -121.829],
+  'Ridgeline Snowshoe Route':     [44.422, -121.848],
+  'Backcountry Creek Route':      [44.441, -121.863],
+  'Summit Connector':             [44.434, -121.855],
+  'Groomed Beginner Loop':        [44.358, -121.774],
+  'Valley Nordic Trail':          [44.365, -121.787],
+  'Ridgeline XC Route':           [44.379, -121.795],
+  'Backcountry Nordic Circuit':   [44.412, -121.834],
+  'Groomed Fat Bike Loop':        [44.352, -121.768],
+  'River Trail (Winter)':         [44.344, -121.759],
+  'Singletrack Snow Loop':        [44.371, -121.792],
+  'Ridge Fat Bike Route':         [44.385, -121.808],
+  'Lower Treed Slopes':           [44.451, -121.877],
+  'Groomed Uptrack to Ridge':     [44.461, -121.889],
+  'North Face Couloir':           [44.478, -121.904],
+  'South Bowl Traverse':          [44.489, -121.918],
+  'Ridgeline Ski Tour':           [44.472, -121.910],
+};
+
+function getDirectionsUrl(trailName){
+  const coords = trailheads[trailName];
+  if(!coords) return '#';
+  const [lat,lng] = coords;
+  const modeMap = { drive:'driving', bike:'bicycling', transit:'transit', here:'walking' };
+  const mode = modeMap[S.transport] || 'driving';
+  // Detect iOS for Apple Maps handoff
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+  if(isIOS){
+    const appleModeMap = { drive:'d', bike:'b', transit:'r', here:'w' };
+    return `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=${appleModeMap[S.transport]||'d'}`;
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`;
+}
+
+// ── Pin colors per trail number ──
+
 </script>
 </body>
 </html>
