@@ -1238,79 +1238,68 @@ function buildMap(){
 
 function buildMapSVG(trails, isSnow){
   const n = Math.min(trails.length, 3);
-
-  // Palette
-  const bg       = isSnow ? '#EBF5FC' : '#EDE8DC';
-  const ctrC     = isSnow ? '#96C0D8' : '#C0A882';  // contour color
-  const waterC   = isSnow ? '#B4D8EE' : '#72B8D4';
-  const forestC  = '#C2D9B4';
-
-  // Three fixed trail paths + their trailhead anchor points
-  const trailDefs = [
-    // ① lower-left loop (climbs a ridge, loops back)
-    { d:'M72,212 C79,197 90,184 101,173 C112,162 122,153 126,141 C130,129 125,116 117,108 C109,100 97,97 86,103 C75,109 67,121 63,135 C59,149 60,165 64,180 C68,196 71,206 72,212 Z',
-      tx:72, ty:212 },
-    // ② middle ridge traverse (point-to-point, follows ridgeline)
-    { d:'M184,226 C191,213 198,202 206,191 C214,180 223,169 232,158 C241,147 250,137 260,127 C270,117 281,108 293,100 C305,92 318,87 331,83 C341,80 350,78 358,77',
-      tx:184, ty:226 },
-    // ③ right valley loop (descends into valley, comes back up)
-    { d:'M308,220 C301,208 293,197 286,186 C279,175 272,165 266,154 C260,143 255,132 252,121 C249,110 249,99 255,90 C261,81 271,75 282,74 C293,73 304,78 312,87 C320,96 324,109 322,124 C320,139 315,155 312,172 C309,189 309,206 308,220 Z',
-      tx:308, ty:220 },
-  ];
-
   let s = '';
 
-  // ── Background ──
-  s += `<rect width="400" height="280" fill="${bg}"/>`;
+  if(isSnow) return buildSnowMapSVG(n);
 
-  // ── Forest patches (non-snow) ──
-  if(!isSnow){
-    s += `<path d="M18,14 Q50,5 84,16 Q110,25 113,50 Q116,75 95,86 Q68,98 42,87 Q18,76 15,52 Q12,28 18,14 Z" fill="${forestC}" opacity="0.55"/>`;
-    s += `<path d="M318,32 Q348,24 372,37 Q391,48 393,74 Q394,100 374,111 Q349,122 324,113 Q303,104 300,80 Q297,56 318,32 Z" fill="${forestC}" opacity="0.55"/>`;
-    s += `<path d="M162,192 Q184,186 202,195 Q216,203 215,217 Q213,231 197,237 Q178,242 163,233 Q150,224 152,210 Q154,197 162,192 Z" fill="${forestC}" opacity="0.45"/>`;
-  }
+  // ── OSM-style trail map ──
 
-  // ── Contour lines ──
-  const contours = isSnow
-    ? [ 'M0,256 Q100,250 200,246 Q300,242 400,238',
-        'M0,234 Q95,227 192,222 Q296,217 400,212',
-        'M0,209 Q90,201 185,195 Q288,189 400,184',
-        'M0,182 Q85,173 178,167 Q280,161 400,155',
-        'M0,153 Q80,143 170,136 Q270,129 400,122',
-        'M0,121 Q75,110 161,103 Q262,96 400,88',
-        'M0,87  Q70,76  153,69  Q253,62 400,54',
-        'M0,52  Q65,41  144,34  Q244,27 400,19' ]
-    : [ 'M0,264 Q80,260 165,256 Q255,252 345,250 Q373,249 400,248',
-        'M0,246 Q75,241 158,236 Q248,231 335,228 Q364,227 400,225',
-        'M0,224 Q70,218 152,212 Q242,206 328,202 Q358,201 400,199',
-        'M0,200 Q65,193 146,186 Q236,179 320,175 Q352,173 400,171',
-        'M0,174 Q60,166 140,158 Q230,150 314,146 Q347,144 400,142',
-        'M0,146 Q55,137 133,129 Q223,121 307,116 Q341,114 400,112',
-        'M0,115 Q50,105 127,97  Q217,89 301,84  Q336,82 400,79',
-        'M0,82  Q45,71  121,63  Q211,55 295,50  Q330,48 400,45',
-        'M0,49  Q40,38  115,30  Q205,22 289,17  Q324,15 400,12' ];
+  // Base: light warm gray (like OpenStreetMap light)
+  s += `<rect width="400" height="280" fill="#E8E8E3"/>`;
 
-  contours.forEach(c=>{
-    s += `<path d="${c}" stroke="${ctrC}" stroke-width="0.85" fill="none" opacity="0.6"/>`;
+  // Park / open-space fills (muted green, like OSM park polygons)
+  s += `<path d="M0,0 L0,128 Q12,124 28,118 Q52,110 70,95 Q86,80 90,60 Q94,40 84,22 Q72,6 52,0 Z" fill="#C8DDB8" opacity="0.55"/>`;
+  s += `<path d="M290,0 L400,0 L400,95 Q385,102 365,100 Q340,96 322,80 Q306,65 304,44 Q302,24 316,10 Z" fill="#C8DDB8" opacity="0.5"/>`;
+  s += `<path d="M148,180 Q168,174 188,180 Q205,186 206,200 Q207,215 192,222 Q174,228 156,221 Q140,214 141,199 Q142,185 148,180 Z" fill="#C8DDB8" opacity="0.45"/>`;
+
+  // Roads — double-stroke casing like OSM
+  s += `<path d="M-5,36 Q100,31 200,29 Q305,27 405,24" stroke="#C0B48A" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M-5,36 Q100,31 200,29 Q305,27 405,24" stroke="#EEE4C0" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M338,-5 Q334,50 337,120 Q340,188 334,285" stroke="#C0B48A" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M338,-5 Q334,50 337,120 Q340,188 334,285" stroke="#EEE4C0" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+
+  // Creek / river — glow halo + solid stroke
+  const river = 'M-5,65 C18,78 42,98 66,118 C90,138 112,158 134,178 C156,198 176,217 196,236 C216,255 236,269 260,276 C282,283 308,282 338,279 L405,277';
+  s += `<path d="${river}" stroke="#A8DCF0" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.35"/>`;
+  s += `<path d="${river}" stroke="#52B8D8" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+
+  // ── Gray trail network (all the other trails in the area) ──
+  const netTrails = [
+    // Left bank (parallels river ~16px above)
+    'M-5,49 C18,62 42,82 66,102 C90,122 112,142 134,162 C156,182 176,201 196,220 C216,239 236,253 260,260 C282,267 308,266 338,263 L405,261',
+    // Right bank (parallels river ~16px below)
+    'M-5,81 C18,94 42,114 66,134 C90,154 112,174 134,194 C156,214 176,233 196,252 C212,268 228,278 248,281',
+    // Spur off left bank into upper-left park
+    'M66,102 C60,88 55,72 52,57 C49,44 52,32 58,22',
+    // Cross-connector mid-area
+    'M175,207 Q178,220 180,232 Q182,245 180,256 Q178,267 178,278',
+    // Trail in upper-right park
+    'M338,24 C337,38 334,55 334,72 Q334,88 337,100',
+    // Lower-right connector
+    'M260,260 Q285,270 310,272 Q328,272 338,270',
+  ];
+  netTrails.forEach(d=>{
+    s += `<path d="${d}" stroke="#A8A8A0" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
   });
 
-  // ── Water ──
-  if(isSnow){
-    // Frozen lake
-    s += `<ellipse cx="150" cy="168" rx="30" ry="17" fill="${waterC}" opacity="0.65"/>`;
-    s += `<ellipse cx="150" cy="168" rx="30" ry="17" fill="none" stroke="${waterC}" stroke-width="1" opacity="0.8"/>`;
-  } else {
-    // Stream running roughly top-to-bottom
-    s += `<path d="M150,0 Q154,16 149,33 Q144,50 150,66 Q156,82 152,97 Q148,112 154,127 Q160,142 156,157 Q152,172 158,188 Q164,204 160,222 Q157,240 162,262 Q164,271 166,280" stroke="${waterC}" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.75"/>`;
-  }
+  // ── Highlighted trail paths (the 3 recommended) ──
+  const trailDefs = [
+    // ① Loop off left-bank spur into upper-left park
+    { d:'M66,102 C60,87 54,71 50,55 C46,41 46,28 52,18 C58,8 68,3 79,5 C90,7 99,16 103,29 C107,42 105,58 99,72 C93,84 84,94 76,100 C72,103 69,103 66,102 Z',
+      tx:66, ty:102 },
+    // ② Ridge spur: branches off right bank, climbs into hills (center-right)
+    { d:'M196,220 C204,206 213,193 224,181 C235,169 247,158 261,149 C275,140 290,133 305,128 C318,124 330,122 340,124 C350,126 357,132 360,140',
+      tx:196, ty:220 },
+    // ③ Loop in lower section off right bank
+    { d:'M260,260 C266,248 272,236 278,224 C284,212 290,200 294,188 C298,176 299,164 294,154 C289,144 279,138 268,138 C257,138 247,145 242,156 C237,167 238,181 244,195 C250,209 258,237 260,260 Z',
+      tx:260, ty:260 },
+  ];
 
-  // ── Trail lines ──
   for(let i=0; i<n; i++){
     const col = pinColors[i];
     s += `<path d="${trailDefs[i].d}" stroke="${col}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    // Faint fill for loops (trails 0 and 2 are closed paths)
-    if(i===0 || i===2){
-      s += `<path d="${trailDefs[i].d}" fill="${col}" opacity="0.08"/>`;
+    if(i===0||i===2){
+      s += `<path d="${trailDefs[i].d}" fill="${col}" opacity="0.08" stroke="none"/>`;
     }
   }
 
@@ -1319,29 +1308,92 @@ function buildMapSVG(trails, isSnow){
     const {tx,ty} = trailDefs[i];
     const col = pinColors[i];
     s += `<circle cx="${tx}" cy="${ty}" r="12" fill="${col}" opacity="0.18"/>`;
-    s += `<circle cx="${tx}" cy="${ty}" r="8"  fill="${col}" stroke="#fff" stroke-width="2"/>`;
+    s += `<circle cx="${tx}" cy="${ty}" r="8" fill="${col}" stroke="#fff" stroke-width="1.5"/>`;
     s += `<text x="${tx}" y="${ty}" dominant-baseline="central" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">${i+1}</text>`;
-    // Parking badge on first trailhead for drivers/bikers
     if(i===0 && (S.transport==='drive'||S.transport==='bike')){
-      const px=tx+18, py=ty-2;
-      s += `<rect x="${px-7}" y="${py-7}" width="14" height="14" rx="3" fill="#3A7CA5" opacity="0.9"/>`;
+      const px=tx+18, py=ty;
+      s += `<rect x="${px-7}" y="${py-7}" width="14" height="14" rx="3" fill="#3A7CA5"/>`;
       s += `<text x="${px}" y="${py}" dominant-baseline="central" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">P</text>`;
     }
   }
 
-  // ── North arrow (upper-right) ──
+  // ── North arrow + scale bar ──
   s += `<g opacity="0.5">
-    <line x1="381" y1="32" x2="381" y2="19" stroke="#555" stroke-width="1.2"/>
-    <polygon points="381,17 378,26 384,26" fill="#555"/>
-    <text x="381" y="38" font-size="8" text-anchor="middle" fill="#555" font-weight="700">N</text>
-  </g>`;
-
-  // ── Scale bar (lower-left) ──
-  s += `<g opacity="0.5">
+    <line x1="381" y1="30" x2="381" y2="18" stroke="#555" stroke-width="1.2"/>
+    <polygon points="381,16 378,25 384,25" fill="#555"/>
+    <text x="381" y="36" font-size="8" text-anchor="middle" fill="#555" font-weight="700">N</text>
+  </g>
+  <g opacity="0.45">
     <line x1="16" y1="270" x2="66" y2="270" stroke="#555" stroke-width="1.5"/>
     <line x1="16" y1="266" x2="16" y2="274" stroke="#555" stroke-width="1.5"/>
     <line x1="66" y1="266" x2="66" y2="274" stroke="#555" stroke-width="1.5"/>
     <text x="41" y="265" font-size="8" text-anchor="middle" fill="#555">1 mi</text>
+  </g>`;
+
+  return s;
+}
+
+function buildSnowMapSVG(n){
+  let s = '';
+
+  // Base: light cool blue-white
+  s += `<rect width="400" height="280" fill="#ECF4FB"/>`;
+
+  // Open snow-covered meadow fills
+  s += `<path d="M0,0 L0,120 Q20,115 45,108 Q72,100 85,80 Q95,62 86,40 Q74,18 48,6 Q24,0 0,0 Z" fill="#DCEEf8" opacity="0.6"/>`;
+  s += `<path d="M295,0 L400,0 L400,90 Q380,96 355,92 Q328,86 314,68 Q302,50 306,28 Q312,8 330,0 Z" fill="#DCEEf8" opacity="0.55"/>`;
+
+  // Roads (cooler tone for winter)
+  s += `<path d="M-5,36 Q100,31 200,29 Q305,27 405,24" stroke="#C0CCD8" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M-5,36 Q100,31 200,29 Q305,27 405,24" stroke="#EAF0F6" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M338,-5 Q334,50 337,120 Q340,188 334,285" stroke="#C0CCD8" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  s += `<path d="M338,-5 Q334,50 337,120 Q340,188 334,285" stroke="#EAF0F6" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+
+  // Frozen river / creek
+  const frozen = 'M-5,65 C18,78 42,98 66,118 C90,138 112,158 134,178 C156,198 176,217 196,236 C216,255 236,269 260,276 C282,283 308,282 338,279 L405,277';
+  s += `<path d="${frozen}" stroke="#B8D8EE" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.7"/>`;
+  s += `<path d="${frozen}" stroke="#88B8D8" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+
+  // Gray trail network
+  ['M-5,49 C18,62 42,82 66,102 C90,122 112,142 134,162 C156,182 176,201 196,220 C216,239 236,253 260,260 C282,267 308,266 338,263 L405,261',
+   'M-5,81 C18,94 42,114 66,134 C90,154 112,174 134,194 C156,214 176,233 196,252 C212,268 228,278 248,281',
+   'M66,102 C60,88 55,72 52,57 C49,44 52,32 58,22',
+   'M338,24 C337,38 334,55 334,72 Q334,88 337,100',
+   'M260,260 Q285,270 310,272 Q328,272 338,270',
+  ].forEach(d=>{
+    s += `<path d="${d}" stroke="#A0B8CC" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  });
+
+  // Highlighted trails (same geometry, same colors)
+  const trailDefs = [
+    { d:'M66,102 C60,87 54,71 50,55 C46,41 46,28 52,18 C58,8 68,3 79,5 C90,7 99,16 103,29 C107,42 105,58 99,72 C93,84 84,94 76,100 C72,103 69,103 66,102 Z', tx:66, ty:102 },
+    { d:'M196,220 C204,206 213,193 224,181 C235,169 247,158 261,149 C275,140 290,133 305,128 C318,124 330,122 340,124 C350,126 357,132 360,140', tx:196, ty:220 },
+    { d:'M260,260 C266,248 272,236 278,224 C284,212 290,200 294,188 C298,176 299,164 294,154 C289,144 279,138 268,138 C257,138 247,145 242,156 C237,167 238,181 244,195 C250,209 258,237 260,260 Z', tx:260, ty:260 },
+  ];
+
+  for(let i=0; i<n; i++){
+    const col = pinColors[i];
+    s += `<path d="${trailDefs[i].d}" stroke="${col}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if(i===0||i===2) s += `<path d="${trailDefs[i].d}" fill="${col}" opacity="0.08" stroke="none"/>`;
+  }
+  for(let i=0; i<n; i++){
+    const {tx,ty} = trailDefs[i];
+    const col = pinColors[i];
+    s += `<circle cx="${tx}" cy="${ty}" r="12" fill="${col}" opacity="0.18"/>`;
+    s += `<circle cx="${tx}" cy="${ty}" r="8" fill="${col}" stroke="#fff" stroke-width="1.5"/>`;
+    s += `<text x="${tx}" y="${ty}" dominant-baseline="central" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">${i+1}</text>`;
+  }
+
+  s += `<g opacity="0.45">
+    <line x1="381" y1="30" x2="381" y2="18" stroke="#446" stroke-width="1.2"/>
+    <polygon points="381,16 378,25 384,25" fill="#446"/>
+    <text x="381" y="36" font-size="8" text-anchor="middle" fill="#446" font-weight="700">N</text>
+  </g>
+  <g opacity="0.4">
+    <line x1="16" y1="270" x2="66" y2="270" stroke="#446" stroke-width="1.5"/>
+    <line x1="16" y1="266" x2="16" y2="274" stroke="#446" stroke-width="1.5"/>
+    <line x1="66" y1="266" x2="66" y2="274" stroke="#446" stroke-width="1.5"/>
+    <text x="41" y="265" font-size="8" text-anchor="middle" fill="#446">1 mi</text>
   </g>`;
 
   return s;
